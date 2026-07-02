@@ -41,7 +41,10 @@ requirements:
 test:
   imports:
     - ngs45
+  requires:
+    - pip
   commands:
+    - pip check
     - ngs45 --version
 
 about:
