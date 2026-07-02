@@ -1,0 +1,14 @@
+# Normalise line endings
+* text=auto eol=lf
+
+# Binary assets
+*.png binary
+*.cm binary
+
+# Keep large-ish generated assets out of language stats
+docs/figures/** linguist-generated
+bench/figures/** linguist-generated
+*.svg linguist-generated
+
+# Data/reference files are not "source"
+src/ngs45/data/** linguist-vendored

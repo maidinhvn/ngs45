@@ -2,6 +2,11 @@
 
 **Recover the 45S nrDNA transcribed unit from Illumina short reads.**
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Python ≥3.9](https://img.shields.io/badge/python-%E2%89%A53.9-blue.svg)
+<!-- after pushing, add:
+![CI](https://github.com/<your-account>/ngs45/actions/workflows/ci.yml/badge.svg) -->
+
 The 45S nrDNA (ETS–18S–ITS1–5.8S–ITS2–26S, followed by the IGS) is a high-copy
 tandem array, so genome-skimming and WGS libraries carry it at very deep
 coverage. Short reads cannot span a repeat, so ngs45 *assembles* the unit: it
@@ -97,6 +102,29 @@ Scope ([docs/ASSEMBLY_LIMITATION.md](docs/ASSEMBLY_LIMITATION.md), [docs/QC.md](
 - **The intrinsic limit is rDNA heterozygosity** — reported as `ribotype_sites`
   (`--call-variants`). When it is high (hybrids/allopolyploids, e.g. *Musa*), the
   short-read consensus blends ribotypes; prefer HiFi + easy45.
+
+## Install from source
+
+```bash
+git clone https://github.com/<your-account>/ngs45.git
+cd ngs45
+conda env create -f environment.yml   # brings in SPAdes, bowtie2, ITSx, ...
+conda activate ngs45
+ngs45 check-deps
+```
+
+## Documentation
+
+- [docs/BENCHMARK.md](docs/BENCHMARK.md) — cross-validation vs HiFi/easy45 + GenBank
+- [docs/FIGURES.md](docs/FIGURES.md) — benchmark figures
+- [docs/QC.md](docs/QC.md) — dataset QC + read-length titration
+- [docs/ASSEMBLY_LIMITATION.md](docs/ASSEMBLY_LIMITATION.md) — scope & limits
+- [docs/DATA_ACCESSIONS.md](docs/DATA_ACCESSIONS.md) — all NCBI/ENA accessions
+
+## Citation
+
+If you use ngs45, please cite it (see [CITATION.cff](CITATION.cff)) and the
+accompanying manuscript (in preparation).
 
 ## License
 

@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use ngs45, please cite this software (and the accompanying manuscript, in preparation)."
+title: "ngs45: recovery of the 45S nrDNA transcribed unit from Illumina short reads"
+abstract: >-
+  ngs45 recovers the 45S nrDNA transcribed unit (18S–ITS1–5.8S–ITS2–26S) from
+  Illumina short-read data by baiting rDNA reads against a conserved 45S seed,
+  assembling them with SPAdes, resolving a single repeat unit, trimming to the
+  mature boundaries with Rfam SSU/LSU covariance models, and annotating the ITS
+  barcode. It reports intragenomic ribotype heterogeneity as a hybridisation /
+  allopolyploidy signal. It is the short-read counterpart of easy45 (HiFi).
+type: software
+authors:
+  - family-names: "Vu"
+    given-names: "Trinh H."
+    email: "maidinhvn@users.noreply.github.com"
+license: MIT
+version: "0.1.0"
+date-released: "2026-07-02"
+keywords:
+  - nrDNA
+  - 45S
+  - rDNA
+  - ITS
+  - Illumina
+  - short-read assembly
+  - ribotype
+  - barcoding
+  - phylogenetics
+# repository-code: "https://github.com/<your-account>/ngs45"   # set after you create the repo
