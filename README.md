@@ -38,13 +38,14 @@ identically and their units are directly comparable.
 ## Install
 
 ```bash
-conda env create -f environment.yml
-conda activate ngs45
+conda install -c conda-forge -c bioconda ngs45
 ngs45 check-deps
 ```
 
 The Python package stays pure-Python; all heavy tools (bowtie2, SPAdes, seqkit,
-BLAST, barrnap, ITSx, bwa/samtools/bcftools) are conda dependencies.
+BLAST, barrnap, ITSx, bwa/samtools/bcftools) are pulled in automatically as
+conda dependencies. To build the exact development environment from source
+instead, see [Install from source](#install-from-source) below.
 
 ## Usage
 
