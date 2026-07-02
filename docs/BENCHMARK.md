@@ -39,7 +39,7 @@ Earlier internal validations (not in the table): **Panax ginseng** ngs45↔easy4
 99.97 %, ITS 100 % GenBank; **Polyscias filicifolia** ngs45 100 % vs an
 independent reference.
 
-## Table 2 — read-length effect (same species, old vs modern run)
+## Table 2 — old vs modern runs (observational; NOT a read-length threshold)
 
 | Species | old run (bp) | old result | modern run (bp) | modern result |
 |---|---|---|---|---|
@@ -48,7 +48,13 @@ independent reference.
 | *Beta vulgaris* | 144 | fail | 150 | 100 % |
 | *Vitis vinifera* | 125 | fail | 151 | 99.85 % |
 
-The ~150 bp threshold is the phasing limit for rDNA spacer variants.
+> ⚠️ This is a **confounded** cross-dataset comparison — the old and modern runs
+> differ in read length **and** error rate, coverage, individual and
+> contamination. A controlled read-length titration (`QC.md`,
+> `bench/trunc_titration.tsv`) shows ngs45 recovers the same unit down to **60 bp**
+> on clean data, so read length is **not** the cause; and QC metrics do not
+> separate the failures (`QC.md`, Fig 5). Interpret this table as "some old public
+> runs fail for dataset-specific reasons", not as a read-length threshold.
 
 ## Table 3 — runtime & memory (wall-clock; illustrative)
 

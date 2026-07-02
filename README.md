@@ -89,13 +89,14 @@ orders. With **modern ≥150 bp PE reads ngs45 recovers the unit for 9/10 specie
 **99.75–100 % identical to the HiFi consensus** (several at 0 mismatches) and
 100 % to GenBank ITS. See [docs/BENCHMARK.md](docs/BENCHMARK.md) and [figures](docs/FIGURES.md); all data IDs in [docs/DATA_ACCESSIONS.md](docs/DATA_ACCESSIONS.md).
 
-Two things govern success ([docs/ASSEMBLY_LIMITATION.md](docs/ASSEMBLY_LIMITATION.md)):
+Scope ([docs/ASSEMBLY_LIMITATION.md](docs/ASSEMBLY_LIMITATION.md), [docs/QC.md](docs/QC.md)):
 
-1. **Read length — use ≥150 bp PE** (ideally 250 bp). Old/short runs (<125 bp)
-   cannot phase the rDNA spacer variants and will fragment.
-2. **rDNA heterozygosity** — reported as `ribotype_sites` (`--call-variants`).
-   When it is high (hybrids/allopolyploids), the short-read consensus blends
-   ribotypes; prefer HiFi + easy45, which reads each ribotype intact.
+- **Not read-length limited.** A controlled titration recovers the same unit down
+  to 60 bp on clean data; the apparent "≥150 bp" pattern across public runs is a
+  cross-dataset confound (QC metrics do not predict success).
+- **The intrinsic limit is rDNA heterozygosity** — reported as `ribotype_sites`
+  (`--call-variants`). When it is high (hybrids/allopolyploids, e.g. *Musa*), the
+  short-read consensus blends ribotypes; prefer HiFi + easy45.
 
 ## License
 

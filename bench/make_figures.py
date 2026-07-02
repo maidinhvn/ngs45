@@ -47,7 +47,7 @@ for r in rows:
         ax.annotate("", xy=(r["rl_mod"], r["pid"]), xytext=(r["rl_old"], FAILY),
                     arrowprops=dict(arrowstyle="->", color=GREY, lw=1, alpha=.6))
 ax.axvline(150, ls="--", c=BLUE, lw=1.2)
-ax.text(152, 99.55, "150 bp\nthreshold", color=BLUE, fontsize=8, va="center")
+ax.text(152, 99.55, "150 bp\n(not causal)", color=BLUE, fontsize=8, va="center")
 # annotate Musa (fails even at 309 bp) — short label above its point, no long arrow
 ax.annotate("Musa: fails even at 309 bp\n(high rDNA heterozygosity)",
             xy=(309, FAILY), xytext=(305, 99.40), fontsize=7.5, color=RED, ha="right",
@@ -55,7 +55,7 @@ ax.annotate("Musa: fails even at 309 bp\n(high rDNA heterozygosity)",
 ax.set_xlabel("Illumina read length (bp)"); ax.set_ylabel("ngs45 unit identity to HiFi (%)")
 ax.set_ylim(99.25, 100.1); ax.set_xlim(60, 330); ax.set_yticks([99.3, 99.5, 99.75, 100.0])
 ax.set_yticklabels(["not\nassembled", "99.5", "99.75", "100"])
-ax.set_title("Read length ≥150 bp enables short-read 45S assembly")
+ax.set_title("Old vs modern runs (observational — see titration, Fig 6)")
 from matplotlib.lines import Line2D
 ax.legend(handles=[Line2D([],[],marker="o",color="w",mfc=GREEN,mec="k",label="old run"),
                    Line2D([],[],marker="s",color="w",mfc=GREEN,mec="k",label="modern run"),
@@ -109,5 +109,51 @@ ax.set_xlabel("ribotype_sites (intragenomic heterozygosity)")
 ax.set_ylabel("ngs45 unit identity to HiFi (%)")
 ax.set_title("More ribotype heterogeneity → blended consensus, lower identity")
 save(fig, "Figure4_ribotype")
+
+# ---- Fig 5: QC metrics do NOT separate assembled vs not (Illumina) ----------
+qc = list(csv.DictReader(open(os.path.join(HERE, "qc_all_datasets.tsv")), delimiter="\t"))
+ill = [q for q in qc if q["role"].startswith("Illumina")]
+fig, ax = plt.subplots(figsize=(7, 4.6))
+for q in ill:
+    rl = f(q["avg_readlen"]); aq = f(q["AvgQual"])
+    if rl is None or aq is None: continue
+    ok = q["ngs45_outcome"] == "assembled"
+    old = q["role"].endswith("old")
+    ax.scatter(rl, aq, s=90, zorder=3,
+               marker=("o" if ok else "X"),
+               c=(GREEN if ok else RED),
+               edgecolor="k", lw=.6, alpha=.9)
+    ax.annotate(q["species"].split("_")[0], (rl, aq), textcoords="offset points",
+                xytext=(6, 3), fontsize=6.5, color=("#333" if old else BLUE))
+ax.set_xlabel("read length (bp)"); ax.set_ylabel("mean base quality (Phred)")
+ax.set_title("Standard QC does not predict assembly success (Illumina runs)")
+from matplotlib.lines import Line2D
+ax.legend(handles=[Line2D([],[],marker="o",color="w",mfc=GREEN,mec="k",label="assembled"),
+                   Line2D([],[],marker="X",color="w",mfc=RED,mec="k",label="not assembled")],
+          fontsize=8, loc="lower right", title="ngs45 outcome")
+ax.text(0.02, 0.03, "fails (red) and successes (green) overlap in QC space\n"
+        "→ read length + base quality alone do not explain the failures",
+        transform=ax.transAxes, fontsize=7.5, style="italic", va="bottom")
+save(fig, "Figure5_QC")
+
+# ---- Fig 6: controlled read-length titration (one clean dataset) ------------
+tt = list(csv.DictReader(open(os.path.join(HERE, "trunc_titration.tsv")), delimiter="\t"))
+L = [f(r["trunc_len"]) for r in tt]; U = [f(r["ngs45_unit"]) for r in tt]
+fig, ax = plt.subplots(figsize=(6.6, 4))
+ax.plot(L, U, "-o", c=GREEN, mec="k", ms=8, lw=1.5, zorder=3)
+ax.axvline(150, ls="--", c=GREY, lw=1)
+ax.set_ylim(0, 6500)
+ax.set_xlabel("read length after in-silico truncation (bp)")
+ax.set_ylabel("ngs45 unit recovered (bp)")
+ax.set_title("Controlled titration: read length is NOT limiting on clean data")
+ax.text(0.5, 0.12,
+        "same reads (Oryza DRR160520), truncated;\n"
+        "full 5783 bp unit at 99.88% to HiFi down to 60 bp\n"
+        "→ the ~150 bp 'threshold' was a cross-dataset confound",
+        transform=ax.transAxes, fontsize=8, ha="center", style="italic")
+for r in tt:
+    ax.annotate(f'{r["ngs45_unit"]}bp', (f(r["trunc_len"]), f(r["ngs45_unit"])),
+                textcoords="offset points", xytext=(0, 8), fontsize=6.5, ha="center")
+save(fig, "Figure6_titration")
 
 print("all figures ->", FIG)
