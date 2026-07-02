@@ -20,12 +20,12 @@ build:
 
 requirements:
   host:
-    - python >=3.9
+    - python {{ python_min }}
     - pip
     - setuptools >=64
     - wheel
   run:
-    - python >=3.9
+    - python >={{ python_min }}
     - biopython >=1.79
     # external tools invoked via subprocess (the package itself is pure-Python)
     - bowtie2
@@ -45,6 +45,7 @@ test:
     - ngs45
   requires:
     - pip
+    - python {{ python_min }}
   commands:
     - pip check
     - ngs45 --version
