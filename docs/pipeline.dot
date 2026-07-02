@@ -4,13 +4,13 @@
 digraph ngs45 {
   rankdir=TB;
   bgcolor="white";
-  graph [fontname="Helvetica", fontsize=22, nodesep=0.22, ranksep=0.60];
-  node  [fontname="Helvetica", fontsize=20];
-  edge  [fontname="Helvetica", fontsize=17, color="#c77800", penwidth=1.8];
+  graph [fontname="Helvetica", fontsize=23, nodesep=0.22, ranksep=0.60];
+  node  [fontname="Helvetica", fontsize=21];
+  edge  [fontname="Helvetica", fontsize=18, color="#c77800", penwidth=1.8];
 
   /* ---------- inputs ---------- */
   subgraph cluster_inputs {
-    label="INPUT"; labeljust="l"; style="dashed"; color="#9aa0a6"; fontsize=19; fontcolor="#5f6368";
+    label="INPUT"; labeljust="l"; style="dashed"; color="#9aa0a6"; fontsize=20; fontcolor="#5f6368";
     reads  [label="Illumina\npaired-end reads\n(FASTQ[.gz])", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
     seed   [label="Bundled 45S seed\nArabidopsis T2T\n(OR453402)", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
     cms    [label="Bundled Rfam\nSSU+LSU CMs\n(RF01960 / RF02543)", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
@@ -41,13 +41,13 @@ digraph ngs45 {
   s6 -> s7;
 
   /* ---------- ribotype note (scientific core) ---------- */
-  rnote [shape=note, style=filled, fillcolor="#fce8e6", color="#c5221f", fontsize=16,
+  rnote [shape=note, style=filled, fillcolor="#fce8e6", color="#c5221f", fontsize=17,
          label="ribotype_sites (--call-variants):\l  map reads back to the unit\l  minor allele >= 10% at depth >= 20\l  high count -> heterogeneous array\l  (hybrid / allopolyploidy signal)\l"];
   s6 -> rnote [style=dotted, arrowhead=none, color="#c5221f"];
 
   /* ---------- outputs ---------- */
   subgraph cluster_outputs {
-    label="OUTPUT"; labeljust="l"; style="dashed"; color="#9aa0a6"; fontsize=19; fontcolor="#5f6368";
+    label="OUTPUT"; labeljust="l"; style="dashed"; color="#9aa0a6"; fontsize=20; fontcolor="#5f6368";
     node [shape=note, style=filled, fillcolor="#e6f4ea", color="#34a853"];
     o_unit [label="nrDNA_45S.fasta\n(mature unit, 18S-26S)"];
     o_its  [label="its.fasta + its_parts.fasta\n(ITS barcode)"];
