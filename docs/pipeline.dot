@@ -14,7 +14,6 @@ digraph ngs45 {
     reads  [label="Illumina paired-end reads\n(FASTQ[.gz])", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
     seed   [label="Bundled 45S seed\nArabidopsis T2T (OR453402)", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
     cms    [label="Bundled Rfam SSU+LSU CMs\n(RF01960 / RF02543)", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
-    orgref [label="Organelle reference\n(optional)", shape=parallelogram, style=filled, fillcolor="#e8eaed"];
   }
 
   /* ---------- pipeline stages ---------- */
@@ -25,13 +24,12 @@ digraph ngs45 {
       fillcolor="#fbbc04", color="#b06000", penwidth=2.0];
   s3 [label="S3  Resolve one repeat unit\nBLAST seed vs contigs + scaffolds"];
   s4 [label="S4  Orient & trim to mature unit (18S 5'-26S 3')\ncmsearch vs Rfam SSU+LSU CMs"];
-  s5 [label="S5  Annotate + ITS barcode\nITSx  (18S / ITS1 / 5.8S / ITS2 / 26S)"];
+  s5 [label="S5  Annotate + ITS barcode\nITSx (18S / ITS1 / 5.8S / ITS2 / 26S) — barrnap fallback"];
   s6 [label="S6  Ribotype heterozygosity\nbwa | samtools | bcftools  (optional)"];
   s7 [label="S7  Summary + report"];
 
   /* ---------- main flow ---------- */
   reads  -> s0;
-  orgref -> s0 [style=dashed, color="#b0b3b8", penwidth=1.0];
   s0 -> s1 [label="reads"];
   seed -> s1;
   s1 -> s2 [label="recruited reads (rDNA)"];
