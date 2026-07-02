@@ -27,8 +27,6 @@ def _build_parser() -> argparse.ArgumentParser:
     r.add_argument("-s", "--seed-ref", default=None,
                    help="45S seed for baiting/orientation "
                         "(default: bundled Arabidopsis T2T 45S unit)")
-    r.add_argument("-r", "--organelle-ref", default=None,
-                   help="plastid+mito genomes for pre-bait depletion (optional)")
     r.add_argument("-o", "--outdir", default="ngs45_out")
     r.add_argument("-t", "--threads", type=int, default=4)
     r.add_argument("--trim", action="store_true", help="quality/adapter trim with cutadapt (S0)")
@@ -81,7 +79,6 @@ def main(argv: list | None = None) -> int:
             reads1=args.reads1,
             reads2=args.reads2,
             seed_ref=args.seed_ref or DEFAULT_SEED,
-            organelle_ref=args.organelle_ref,
             outdir=args.outdir,
             threads=args.threads,
             trim=args.trim,

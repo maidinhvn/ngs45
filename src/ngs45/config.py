@@ -30,7 +30,6 @@ class Config:
     reads2: Path | None = None         # R2; None => single-end / interleaved handled upstream
     seed_ref: Path = DEFAULT_SEED      # 45S seed for baiting + orientation
     cm_ref: Path = DEFAULT_CM          # Rfam SSU+LSU CMs for mature-boundary trim (S4)
-    organelle_ref: Path | None = None  # plastid+mito genomes to deplete before baiting
 
     # --- outputs ----------------------------------------------------------
     outdir: Path = Path("ngs45_out")
@@ -74,8 +73,6 @@ class Config:
             self.reads2 = Path(self.reads2)
         self.seed_ref = Path(self.seed_ref)
         self.cm_ref = Path(self.cm_ref)
-        if self.organelle_ref is not None:
-            self.organelle_ref = Path(self.organelle_ref)
         self.outdir = Path(self.outdir)
         if self.workdir is None:
             self.workdir = self.outdir / "work"

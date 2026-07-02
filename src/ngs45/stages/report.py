@@ -66,9 +66,6 @@ def run(config: Config, state: dict) -> dict:
     if n_sites is not None:
         tail = "  (heterogeneous array — possible hybrid/allopolyploid)" if n_sites else ""
         L += ["", f"ribotype-variant sites: {n_sites}{tail}"]
-    if not config.organelle_ref:
-        L += ["", "note: no organelle reference given (-r); recruited reads were "
-              "not organelle-depleted before assembly."]
     report = config.outdir / "report.txt"
     report.write_text("\n".join(L) + "\n")
 
