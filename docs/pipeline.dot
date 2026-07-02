@@ -1,0 +1,69 @@
+// ngs45 pipeline — render: dot -Tpng -Gdpi=300 docs/pipeline.dot -o docs/pipeline.png
+//                          dot -Tsvg           docs/pipeline.dot -o docs/pipeline.svg
+// Style matched to easy45 (sibling tool) for consistency.
+digraph ngs45 {
+  rankdir=TB;
+  bgcolor="white";
+  graph [fontname="Helvetica", fontsize=17, nodesep=0.45, ranksep=0.55];
+  node  [fontname="Helvetica", fontsize=15];
+  edge  [fontname="Helvetica", fontsize=13, color="#c77800", penwidth=1.6];
+
+  /* ---------- inputs ---------- */
+  subgraph cluster_inputs {
+    label="INPUT"; labeljust="l"; style="dashed"; color="#9aa0a6"; fontsize=15; fontcolor="#5f6368";
+    reads  [label="Illumina paired-end reads\n(FASTQ[.gz])", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
+    seed   [label="Bundled 45S seed\nArabidopsis T2T (OR453402)", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
+    cms    [label="Bundled Rfam SSU+LSU CMs\n(RF01960 / RF02543)", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
+    orgref [label="Organelle reference\n(optional)", shape=parallelogram, style=filled, fillcolor="#e8eaed"];
+  }
+
+  /* ---------- pipeline stages ---------- */
+  node [shape=box, style="rounded,filled", fillcolor="#fef7e0", color="#e8a33d"];
+  s0 [label="S0  QC / trim reads\ncutadapt  (optional)"];
+  s1 [label="S1  Bait rDNA reads\nbowtie2 — iterative recruitment vs 45S seed"];
+  s2 [label="S2  Assemble recruited reads\nSPAdes multi-k  (k < read length)",
+      fillcolor="#fbbc04", color="#b06000", penwidth=2.0];
+  s3 [label="S3  Resolve one repeat unit\nBLAST seed vs contigs + scaffolds"];
+  s4 [label="S4  Orient & trim to mature unit (18S 5'-26S 3')\ncmsearch vs Rfam SSU+LSU CMs"];
+  s5 [label="S5  Annotate + ITS barcode\nITSx  (18S / ITS1 / 5.8S / ITS2 / 26S)"];
+  s6 [label="S6  Ribotype heterozygosity\nbwa | samtools | bcftools  (optional)"];
+  s7 [label="S7  Summary + report"];
+
+  /* ---------- main flow ---------- */
+  reads  -> s0;
+  orgref -> s0 [style=dashed, color="#b0b3b8", penwidth=1.0];
+  s0 -> s1 [label="reads"];
+  seed -> s1;
+  s1 -> s2 [label="recruited reads (rDNA)"];
+  s2 -> s3 [label="contigs + scaffolds"];
+  s3 -> s4 [label="one repeat unit"];
+  cms -> s4;
+  s4 -> s5 [label="mature 18S-26S unit"];
+  s5 -> s6 [label="consensus unit"];
+  s6 -> s7;
+
+  /* ---------- ribotype note (scientific core) ---------- */
+  rnote [shape=note, style=filled, fillcolor="#fce8e6", color="#c5221f", fontsize=13,
+         label="ribotype_sites (--call-variants):\l  map reads back to the unit\l  minor allele >= 10% at depth >= 20\l  high count -> heterogeneous array\l  (hybrid / allopolyploidy signal)\l"];
+  s6 -> rnote [style=dotted, arrowhead=none, color="#c5221f"];
+
+  /* ---------- outputs ---------- */
+  subgraph cluster_outputs {
+    label="OUTPUT"; labeljust="l"; style="dashed"; color="#9aa0a6"; fontsize=15; fontcolor="#5f6368";
+    node [shape=note, style=filled, fillcolor="#e6f4ea", color="#34a853"];
+    o_unit [label="nrDNA_45S.fasta\n(mature unit, 18S-26S)"];
+    o_its  [label="its.fasta + its_parts.fasta\n(ITS barcode)"];
+    o_reg  [label="regions/\n(five 45S regions)"];
+    o_gff  [label="annotation.gff3"];
+    o_rib  [label="ribotype_variants.tsv"];
+    o_rep  [label="summary.tsv + report.txt"];
+  }
+
+  s7 -> o_unit;
+  s7 -> o_its  [style=invis];
+  s7 -> o_reg  [style=invis];
+  s7 -> o_gff  [style=invis];
+  s7 -> o_rib  [style=invis];
+  s7 -> o_rep  [style=invis];
+  { rank=same; o_unit; o_its; o_reg; o_gff; o_rib; o_rep; }
+}
