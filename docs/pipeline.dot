@@ -12,7 +12,7 @@ digraph ngs45 {
   subgraph cluster_inputs {
     label="INPUT"; labeljust="l"; style="dashed"; color="#9aa0a6"; fontsize=20; fontcolor="#5f6368";
     reads  [label="Illumina\npaired-end reads\n(FASTQ[.gz])", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
-    seed   [label="Bundled 45S seed\nArabidopsis T2T\n(OR453402)", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
+    seed   [label=<Bundled 45S seed<BR/><I>Arabidopsis</I> T2T<BR/>(OR453402)>, shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
     cms    [label="Bundled Rfam\nSSU+LSU CMs\n(RF01960 / RF02543)", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
   }
 

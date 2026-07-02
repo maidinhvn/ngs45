@@ -38,10 +38,11 @@
 <!-- seed -->
 <g id="node2" class="node">
 <title>seed</title>
-<polygon fill="#d2e3fc" stroke="black" points="883,-1208 546.55,-1208 460,-1054 796.45,-1054 883,-1208"/>
-<text text-anchor="middle" x="671.5" y="-1148.7" font-family="Helvetica,sans-Serif" font-size="21.00">Bundled 45S seed</text>
-<text text-anchor="middle" x="671.5" y="-1125.7" font-family="Helvetica,sans-Serif" font-size="21.00">Arabidopsis T2T</text>
-<text text-anchor="middle" x="671.5" y="-1102.7" font-family="Helvetica,sans-Serif" font-size="21.00">(OR453402)</text>
+<polygon fill="#d2e3fc" stroke="black" points="883,-1202 546.55,-1202 460,-1060 796.45,-1060 883,-1202"/>
+<text text-anchor="start" x="575.5" y="-1146.7" font-family="Helvetica,sans-Serif" font-size="21.00">Bundled 45S seed</text>
+<text text-anchor="start" x="586.5" y="-1125.7" font-family="Helvetica,sans-Serif" font-style="italic" font-size="21.00">Arabidopsis</text>
+<text text-anchor="start" x="710.5" y="-1125.7" font-family="Helvetica,sans-Serif" font-size="21.00"> T2T</text>
+<text text-anchor="start" x="607" y="-1104.7" font-family="Helvetica,sans-Serif" font-size="21.00">(OR453402)</text>
 </g>
 <!-- s1 -->
 <g id="node5" class="node">
@@ -53,8 +54,8 @@
 <!-- seed&#45;&gt;s1 -->
 <g id="edge3" class="edge">
 <title>seed&#45;&gt;s1</title>
-<path fill="none" stroke="#c77800" stroke-width="1.8" d="M671.5,-1053.71C671.5,-1003.67 671.5,-940.51 671.5,-901.44"/>
-<polygon fill="#c77800" stroke="#c77800" stroke-width="1.8" points="675,-901.09 671.5,-891.09 668,-901.09 675,-901.09"/>
+<path fill="none" stroke="#c77800" stroke-width="1.8" d="M671.5,-1059.68C671.5,-1008.73 671.5,-941.91 671.5,-901.28"/>
+<polygon fill="#c77800" stroke="#c77800" stroke-width="1.8" points="675,-901.05 671.5,-891.05 668,-901.05 675,-901.05"/>
 </g>
 <!-- cms -->
 <g id="node3" class="node">
