@@ -87,7 +87,7 @@ philosophy.
 Cross-validated against HiFi/easy45 and GenBank on 10 species across 9 angiosperm
 orders. With **modern ≥150 bp PE reads ngs45 recovers the unit for 9/10 species**,
 **99.75–100 % identical to the HiFi consensus** (several at 0 mismatches) and
-100 % to GenBank ITS. See [docs/BENCHMARK.md](docs/BENCHMARK.md); all data IDs in [docs/DATA_ACCESSIONS.md](docs/DATA_ACCESSIONS.md).
+100 % to GenBank ITS. See [docs/BENCHMARK.md](docs/BENCHMARK.md) and [figures](docs/FIGURES.md); all data IDs in [docs/DATA_ACCESSIONS.md](docs/DATA_ACCESSIONS.md).
 
 Two things govern success ([docs/ASSEMBLY_LIMITATION.md](docs/ASSEMBLY_LIMITATION.md)):
 

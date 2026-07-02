@@ -1,0 +1,11 @@
+species	order	readlen_old	ngs45_old	readlen_modern	ngs45_modern	easy45_unit	unitPID	ribo_sites	ITS_gb
+Oryza_sativa	Poales	73	N	250.0	Y	5782	99.879	15	NA
+Musa_acuminata	Zingiberales	309	N	100.0	N	5804	NA	NA	NA
+Solanum_lycopersicum	Solanales	100	Y	91.0	Y	5800	100.000	5	100.000
+Helianthus_annuus	Asterales	91	N	150.0	Y	5857	99.928	0	NA
+Sesamum_indicum	Lamiales	96	Y	150.0	Y	5798	100.000	6	100.000
+Beta_vulgaris	Caryophyllales	144	N	150.0	Y	5811	100.000	1	100.000
+Vitis_vinifera	Vitales	125	N	151.0	Y	5881	99.847	13	NA
+Glycine_max	Fabales	100	Y	149.7	Y	5799	100.000	1	NA
+Gossypium_hirsutum	Malvales	101	Y	101.0	Y	5883	99.953	4	100.000
+Citrus_sinensis	Sapindales	100	N	151.0	Y	5844	99.749	29	NA
