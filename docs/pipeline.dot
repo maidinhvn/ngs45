@@ -4,16 +4,16 @@
 digraph ngs45 {
   rankdir=TB;
   bgcolor="white";
-  graph [fontname="Helvetica", fontsize=22, nodesep=0.50, ranksep=0.60];
+  graph [fontname="Helvetica", fontsize=22, nodesep=0.22, ranksep=0.60];
   node  [fontname="Helvetica", fontsize=20];
   edge  [fontname="Helvetica", fontsize=17, color="#c77800", penwidth=1.8];
 
   /* ---------- inputs ---------- */
   subgraph cluster_inputs {
     label="INPUT"; labeljust="l"; style="dashed"; color="#9aa0a6"; fontsize=19; fontcolor="#5f6368";
-    reads  [label="Illumina paired-end reads\n(FASTQ[.gz])", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
-    seed   [label="Bundled 45S seed\nArabidopsis T2T (OR453402)", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
-    cms    [label="Bundled Rfam SSU+LSU CMs\n(RF01960 / RF02543)", shape=parallelogram, style=filled, fillcolor="#d2e3fc"];
+    reads  [label="Illumina\npaired-end reads\n(FASTQ[.gz])", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
+    seed   [label="Bundled 45S seed\nArabidopsis T2T\n(OR453402)", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
+    cms    [label="Bundled Rfam\nSSU+LSU CMs\n(RF01960 / RF02543)", shape=parallelogram, style=filled, fillcolor="#d2e3fc", margin="0.08,0.05"];
   }
 
   /* ---------- pipeline stages ---------- */
