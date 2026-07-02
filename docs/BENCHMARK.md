@@ -76,8 +76,11 @@ Full per-species numbers: `bench/timing_isolated.tsv`.
 
 ## Reproducing
 
+- **All NCBI/ENA accessions**: [DATA_ACCESSIONS.md](DATA_ACCESSIONS.md) (HiFi,
+  old + modern Illumina, GenBank ITS refs, bundled seed/CM).
 - Modern benchmark driver: `bench/run_modern_benchmark.sh` (streams read subsets
   from ENA, runs ngs45, compares to the cached easy45 HiFi consensus).
-- Accessions: `bench/manifest_modern.tsv`.
+- Accession manifests: `bench/manifest_modern.tsv`, `bench/manifest.tsv`,
+  `bench/manifest_hifi_long.tsv`.
 - Raw tables: `bench/benchmark_modern.tsv`, `bench/benchmark_final.tsv` (old
   input), `bench/timing_isolated.tsv`.
