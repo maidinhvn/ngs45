@@ -38,7 +38,9 @@ requirements:
     - bwa
     - samtools
     - bcftools
-    - cutadapt
+    # cutadapt >=5.0 requires dnaio >=1.2.3, which has no py310 build;
+    # test env is pinned to python_min (3.10), so cap cutadapt (S0 trim only).
+    - cutadapt <5.0
 
 test:
   imports:
