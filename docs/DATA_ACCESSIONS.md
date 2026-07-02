@@ -49,6 +49,12 @@ Notes:
 | *Panax ginseng* (Araliaceae) | SRR35147962 | SRR5196586 | GenBank ITS **U41680.1**, **U41682.1** |
 | *Polyscias filicifolia* (Araliaceae) | — | IM240312-1 (in-house WGS) | in-house *P. filicifolia* 45S nrDNA reference |
 
+## Derived / in-silico datasets (no new download)
+
+| Analysis | Source accession | Derivation |
+|---|---|---|
+| Read-length titration (controlled test that read length — not dataset identity — sets the ~150 bp threshold) | **DRR160520** (*Oryza sativa*, 250 bp) | reads truncated in-silico to 250 / 200 / 150 / 130 / 110 / 90 bp; everything else (individual, coverage, chemistry) held constant. Output: `bench/trunc_titration.tsv` |
+
 ## Machine-readable manifests (in `bench/`)
 
 | File | Contents |
