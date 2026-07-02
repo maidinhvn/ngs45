@@ -12,6 +12,8 @@ source:
 build:
   noarch: python
   number: 0
+  run_exports:
+    - {{ pin_subpackage('ngs45', max_pin="x.x") }}
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   entry_points:
     - ngs45 = ngs45.cli:main
