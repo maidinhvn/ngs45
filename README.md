@@ -5,7 +5,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Python ≥3.9](https://img.shields.io/badge/python-%E2%89%A53.9-blue.svg)
 <!-- after pushing, add:
-![CI](https://github.com/<your-account>/ngs45/actions/workflows/ci.yml/badge.svg) -->
+![CI](https://github.com/maidinhvn/ngs45/actions/workflows/ci.yml/badge.svg) -->
 
 The 45S nrDNA (ETS–18S–ITS1–5.8S–ITS2–26S, followed by the IGS) is a high-copy
 tandem array, so genome-skimming and WGS libraries carry it at very deep
@@ -32,7 +32,7 @@ S7 Report        summary table + human-readable report
 ```
 
 The S4 mature-boundary trim reuses the **same bundled Rfam CM as
-[easy45](../45S_nrDNA_tool)**, so both tools define the 18S/26S termini
+[easy45](https://github.com/maidinhvn/easy45)**, so both tools define the 18S/26S termini
 identically and their units are directly comparable.
 
 ## Install
@@ -82,7 +82,7 @@ Run `ngs45 run --help` for all parameters.
 ## Relationship to easy45
 
 ngs45 is the **short-read** counterpart of
-[easy45](../45S_nrDNA_tool) (HiFi long reads). easy45 recovers ribotypes
+[easy45](https://github.com/maidinhvn/easy45) (HiFi long reads). easy45 recovers ribotypes
 assembly-free because one HiFi read spans a whole unit; ngs45 must assemble the
 unit because short reads cannot. They share the same 45S seed and annotation
 philosophy.
@@ -106,7 +106,7 @@ Scope ([docs/ASSEMBLY_LIMITATION.md](docs/ASSEMBLY_LIMITATION.md), [docs/QC.md](
 ## Install from source
 
 ```bash
-git clone https://github.com/<your-account>/ngs45.git
+git clone https://github.com/maidinhvn/ngs45.git
 cd ngs45
 conda env create -f environment.yml   # brings in SPAdes, bowtie2, ITSx, ...
 conda activate ngs45
