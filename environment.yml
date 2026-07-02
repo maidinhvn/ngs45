@@ -1,0 +1,24 @@
+name: ngs45
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python>=3.9
+  - biopython>=1.79
+  # external bioinformatics tools (invoked via subprocess) ---------------
+  - bowtie2        # S1 iterative baiting of rDNA reads
+  - spades         # S2 de Bruijn assembly of recruited reads
+  - seqkit         # read/contig manipulation
+  - blast          # S3/S4 locate the repeat unit & genes on contigs
+  - bwa            # S6 map reads back to the monomer
+  - samtools       # S6 BAM handling / depth
+  - bcftools       # S6 ribotype variant calling
+  - infernal       # cmsearch: Rfam SSU/LSU CM mature-boundary trim (S4)
+  - barrnap        # S4 orientation (18S strand)
+  - itsx           # S5 delimit SSU/ITS1/5.8S/ITS2/LSU (annotation + ITS barcode)
+  - cutadapt       # S0 adapter / quality trimming
+  # dev ------------------------------------------------------------------
+  - pytest
+  - pip
+  - pip:
+      - -e .

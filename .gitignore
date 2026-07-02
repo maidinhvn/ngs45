@@ -1,0 +1,37 @@
+# ---- python ----
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# ---- run outputs / scratch ----
+ngs45_out/
+testrun_*/
+testdata/
+ncbi_test/
+*.log
+
+# ---- sequence data (never commit reads/alignments) ----
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+*.sra
+*.vcf
+
+# ---- benchmark heavy data (keep bench/*.sh, *.tsv, *.txt, *.py, manifests) ----
+bench/data/
+bench/modern_data/
+bench/results/
+bench/results_isolated/
+bench/modern_results/
+bench/tmp/
+bench/getorganelle/
+bench/ribotin/
+bench/blast/
+bench/ident/
+bench/*.stdout

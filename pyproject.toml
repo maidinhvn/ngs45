@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ngs45"
+version = "0.1.0"
+description = "Seed-and-assemble recovery of the 45S nrDNA transcribed unit from Illumina short reads"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "Trinh H. Vu", email = "maidinhvn@users.noreply.github.com" }]
+keywords = ["nrDNA", "45S", "rDNA", "Illumina", "short-read", "assembly", "barcoding", "phylogenetics"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+# Keep pip dependencies minimal. All heavy bioinformatics tools
+# (bowtie2, spades, seqkit, blast, barrnap, itsx, bwa, samtools) are
+# declared as conda run-dependencies in environment.yml, NOT here.
+dependencies = [
+    "biopython>=1.79",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+ngs45 = "ngs45.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ngs45 = ["data/*.fasta", "data/*.cm"]

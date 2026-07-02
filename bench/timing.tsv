@@ -1,0 +1,10 @@
+species	data_type	accession	wall_sec
+Sesamum indicum	Illumina/ngs45	ERR710504	120
+Solanum lycopersicum	Illumina/ngs45	SRR1572286	184
+Solanum lycopersicum	HiFi/easy45	SRR29015864	12
+Vitis vinifera	Illumina/ngs45	SRR4210153	60
+Vitis vinifera	HiFi/easy45	ERR17353932	123
+Gossypium hirsutum	Illumina/ngs45	SRR1580594	102
+Gossypium hirsutum	HiFi/easy45	SRR38842326	332
+Musa acuminata	Illumina/ngs45	SRR6489399	154
+Beta vulgaris	Illumina/ngs45	SRR6315553	71

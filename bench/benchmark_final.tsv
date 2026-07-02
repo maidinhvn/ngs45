@@ -1,0 +1,11 @@
+order	species	ngs45_unit	ngs45_ITS	ribo_sites	easy45_unit	easy45_ITS	unitPID/mm	ITS_ngsVSez	ITS_ngsVSgb	ITS_ezVSgb	ngs45_wall_s	easy45_wall_s
+Poales	Oryza sativa	NA	NA	NA	5782	585	NA/NAmm	NA	NA	NA	72	80
+Zingiberales	Musa acuminata	NA	NA	NA	5804	588	NA/NAmm	NA	NA	99.830	755	198
+Solanales	Solanum lycopersicum	5800	599	0	5800	599	100.000/0mm	100.000	100.000	100.000	113	145
+Asterales	Helianthus annuus	NA	NA	NA	5857	650	NA/NAmm	NA	NA	NA	59	72
+Lamiales	Sesamum indicum	5798	597	7	5798	597	100.000/0mm	100.000	100.000	100.000	182	410
+Caryophyllales	Beta vulgaris	NA	NA	NA	5811	622	NA/NAmm	NA	NA	100.000	130	367
+Vitales	Vitis vinifera	NA	NA	NA	5881	669	NA/NAmm	NA	NA	87.915	103	116
+Fabales	Glycine max	5898	594	1	5799	594	99.981/1mm	99.832	NA	NA	278	165
+Malvales	Gossypium hirsutum	5985	682	4	5883	682	99.953/2mm	100.000	100.000	100.000	227	689
+Sapindales	Citrus sinensis	NA	NA	NA	5844	639	NA/NAmm	NA	NA	NA	150	227

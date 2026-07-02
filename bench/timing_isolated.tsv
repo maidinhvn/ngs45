@@ -1,0 +1,21 @@
+species	data_type	accession	wall_sec	cpu_sec	max_rss_kb
+Oryza sativa	Illumina/ngs45	ERR009651	72	557	502484
+Oryza sativa	HiFi/easy45	SRR13280199	80	610	5460888
+Musa acuminata	Illumina/ngs45	SRR6489399	755	6854	3853504
+Musa acuminata	HiFi/easy45	SRR23425448	198	2329	5541412
+Solanum lycopersicum	Illumina/ngs45	SRR1572286	113	606	3882196
+Solanum lycopersicum	HiFi/easy45	SRR29015864	145	1806	5546380
+Helianthus annuus	Illumina/ngs45	SRR5160794	59	458	448284
+Helianthus annuus	HiFi/easy45	SRR14782853	72	658	5578756
+Sesamum indicum	Illumina/ngs45	ERR710504	182	1273	3651396
+Sesamum indicum	HiFi/easy45	NA	410	2978	5545072
+Beta vulgaris	Illumina/ngs45	SRR6315553	130	845	647848
+Beta vulgaris	HiFi/easy45	SRR37382116	367	4079	5557068
+Vitis vinifera	Illumina/ngs45	SRR4210153	103	526	463284
+Vitis vinifera	HiFi/easy45	ERR17353932	116	685	5630536
+Glycine max	Illumina/ngs45	SRR1463414	278	2190	2633408
+Glycine max	HiFi/easy45	SRR38619744	165	1885	5472572
+Gossypium hirsutum	Illumina/ngs45	SRR1580594	227	1496	2087656
+Gossypium hirsutum	HiFi/easy45	SRR38842326	689	4379	5667488
+Citrus sinensis	Illumina/ngs45	ERR466624	150	681	485496
+Citrus sinensis	HiFi/easy45	SRR27236983	227	2002	5598412
