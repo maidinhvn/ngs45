@@ -49,9 +49,31 @@ instead, see [Install from source](#install-from-source) below.
 
 ## Usage
 
+ngs45 works in **two stages**, both inside the single `run` command — a flag
+decides whether the second one happens:
+
+**Stage 1 — assemble the 45S unit** *(always runs)*. Baits rDNA reads, assembles
+them (SPAdes), resolves one repeat unit, trims it to the mature 18S→26S
+transcribed unit with the Rfam CMs, and annotates the ITS barcode. This is all
+most users need.
+
 ```bash
 ngs45 run -1 reads_R1.fastq.gz -2 reads_R2.fastq.gz -o out/ -t 16
 ```
+
+**Stage 2 — ribotype heterogeneity** *(optional — add `--call-variants`)*. Maps
+the recruited reads back onto the assembled unit and flags positions where the
+thousands of rDNA copies disagree — the signal of intragenomic ribotype variation
+(hybridisation / allopolyploidy), written to `ribotype_variants.tsv`. It reuses
+the stage-1 products (no re-assembly) and maps the **full-depth** read set.
+
+```bash
+ngs45 run -1 reads_R1.fastq.gz -2 reads_R2.fastq.gz -o out/ -t 16 --call-variants
+```
+
+Both stages run in this one command. On a whole-genome library, stage 1 is
+~15 min and stage 2 adds ~1 min; omit `--call-variants` if you only need the
+unit / ITS barcode.
 
 | Flag | Required? | Meaning |
 |------|-----------|---------|
@@ -59,13 +81,19 @@ ngs45 run -1 reads_R1.fastq.gz -2 reads_R2.fastq.gz -o out/ -t 16
 | `-2, --reads2` | no | Illumina R2 (paired-end; omit for single-end) |
 | `-o, --outdir` | no | output folder (default `ngs45_out/`) |
 | `-s, --seed-ref` | no | custom 45S seed (default: bundled Arabidopsis T2T unit) |
-| `-r, --organelle-ref` | no | plastid+mito genomes to deplete before baiting |
+| `--call-variants` | no | **stage 2**: report intragenomic ribotype heterogeneity |
 | `--trim` | no | quality/adapter-trim reads first (cutadapt) |
 | `--bait-rounds` | no | iterative-baiting rounds (default 3) |
-| `--call-variants` | no | report intragenomic ribotype heterogeneity (S6) |
+| `--max-cov` | no | cap assembly depth (default `2000`; `0` disables) — see note |
 | `-t, --threads` | no | threads (default 4) |
 
 Run `ngs45 run --help` for all parameters.
+
+> **Speed / coverage note.** The rDNA array is 10⁴–10⁵× deep — useless for
+> assembly and the dominant runtime cost. `--max-cov` downsamples the **assembly
+> input only** (to ~2000× of a repeat by default), cutting SPAdes from ~70 min to
+> ~2 min with an essentially identical unit (99.98 % id). Stage 2 variant calling always uses
+> the **full** read depth, so ribotype sensitivity is unaffected by this cap.
 
 ## Outputs (`outdir/`)
 
