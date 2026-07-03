@@ -52,6 +52,47 @@ def _klist_for(readlen: int, configured: str) -> str:
     return ",".join(str(k) for k in ks)
 
 
+def _n_seqs(path) -> int:
+    """Read count via seqkit stats (num_seqs, col 4)."""
+    cp = sh(["seqkit", "stats", "-T", str(path)])
+    lines = cp.stdout.strip().splitlines()
+    try:
+        return int(lines[1].split("\t")[3])
+    except (ValueError, IndexError):
+        return 0
+
+
+def _cap_coverage(config: Config, r1, r2, readlen):
+    """Downsample the baited reads to ~assemble_max_cov x of a nominal rDNA repeat.
+
+    The rDNA array is a very high-copy tandem repeat, so baiting recruits 10^4-10^5 x
+    coverage — useless for assembly and the dominant time cost (SPAdes ~35x slower).
+    We cap the *assembly input* only; the full bait set is untouched for S6 depth.
+    Returns (r1, r2) possibly pointing at downsampled copies.
+    """
+    if config.assemble_max_cov <= 0 or readlen <= 0:
+        return r1, r2
+    n_pairs = _n_seqs(r1)
+    if n_pairs <= 0:
+        return r1, r2
+    ref = config.unit_min_len * 2.5          # nominal full repeat (~10 kb) for coverage
+    per_pair = readlen * (2 if r2 is not None else 1)
+    cov = n_pairs * per_pair / ref
+    if cov <= config.assemble_max_cov:
+        return r1, r2
+    frac = round(config.assemble_max_cov / cov, 6)
+    ds1 = config.workdir / "s2_ds_R1.fastq.gz"
+    sh(["seqkit", "sample", "-p", str(frac), "-s", "100", "-o", str(ds1), str(r1)])
+    ds2 = None
+    if r2 is not None:
+        ds2 = config.workdir / "s2_ds_R2.fastq.gz"
+        sh(["seqkit", "sample", "-p", str(frac), "-s", "100", "-o", str(ds2), str(r2)])
+    log.info("S2: baited depth ~%.0fx of a ~%.0f kb repeat -> downsampled %d -> ~%d "
+             "read pairs (cap %dx) for assembly", cov, ref / 1000, n_pairs,
+             int(n_pairs * frac), config.assemble_max_cov)
+    return ds1, ds2
+
+
 def run(config: Config, state: dict) -> dict:
     r1 = state["bait_r1"]
     r2 = state.get("bait_r2")
@@ -59,6 +100,7 @@ def run(config: Config, state: dict) -> dict:
 
     readlen = _read_length(r1)
     klist = _klist_for(readlen, config.spades_klist)
+    r1, r2 = _cap_coverage(config, r1, r2, readlen)
 
     cmd = ["spades.py", "-o", str(spades_dir), "-k", klist, "-t", str(config.threads)]
     if config.spades_careful:

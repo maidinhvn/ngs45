@@ -34,6 +34,10 @@ def _build_parser() -> argparse.ArgumentParser:
     r.add_argument("--subsample", type=int, default=0,
                    help="cap recruited pairs (0 = keep all)")
     r.add_argument("--spades-k", default="auto", help="SPAdes k-mer list (default auto)")
+    r.add_argument("--max-cov", type=int, default=2000,
+                   help="cap baited depth for assembly to ~this x of an rDNA repeat "
+                        "(0 = no cap). The array is 10^4-10^5x deep; capping keeps "
+                        "S2 fast without losing the unit (full reads still used for S6)")
     r.add_argument("--call-variants", action="store_true",
                    help="map reads back and report ribotype heterogeneity (S6)")
     r.add_argument("--no-resume", action="store_true", help="ignore previous run state")
@@ -85,6 +89,7 @@ def main(argv: list | None = None) -> int:
             bait_rounds=args.bait_rounds,
             subsample=args.subsample,
             spades_k=args.spades_k,
+            assemble_max_cov=args.max_cov,
             call_variants=args.call_variants,
             resume=not args.no_resume,
         )

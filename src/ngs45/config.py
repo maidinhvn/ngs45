@@ -52,6 +52,10 @@ class Config:
     spades_careful: bool = False       # off by default: --careful's mismatch corrector
                                        # fragments variant-rich rDNA (see stages/assemble.py)
     min_cov: float = 0.0               # drop assembly-graph nodes below this k-mer coverage
+    assemble_max_cov: int = 2000       # cap baited depth before SPAdes: the rDNA array is
+                                       # 10^4-10^5x deep, which is useless and makes assembly
+                                       # ~35x slower. Downsample to ~this x of a nominal repeat.
+                                       # 0 disables. Full reads are still used for S6 variants.
 
     # --- Stage 3: monomer resolution --------------------------------------
     unit_min_len: int = 4000           # a 45S transcribed unit is typically 5-8 kb
