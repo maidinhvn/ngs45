@@ -58,6 +58,14 @@ class Config:
     unit_max_len: int = 20000          # ceiling incl. long IGS
     min_gene_ident: float = 70.0       # blast %id for a seed-gene hit on a contig
 
+    # --- Stage 4: mature-boundary trim + assembly QC ----------------------
+    dup_min_len: int = 40              # collapse an internal tandem duplication in the
+    dup_min_ident: float = 97.0        #   unit that is >= this long at >= this % id and
+                                       #   sits immediately next to its source. rRNA
+                                       #   genes are single-copy, so such a perfect
+                                       #   adjacent repeat is a mis-assembly across a
+                                       #   unit junction, not biology (see docs).
+
     # --- Stage 6: ribotype variants (optional) ----------------------------
     call_variants: bool = False
     var_min_freq: float = 0.10         # minor-allele fraction to report a ribotype site

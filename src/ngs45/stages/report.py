@@ -39,6 +39,7 @@ def run(config: Config, state: dict) -> dict:
         "26S_len": rlens.get("26S", ""),
         "ITS_barcode_len": annot.get("ITS_barcode_len", ""),
         "ribotype_sites": n_sites if n_sites is not None else "",
+        "qc_tandem_dup_bp": sum(state.get("qc_dup_removed") or []),
     }
     summary = config.outdir / "summary.tsv"
     with open(summary, "w") as s:
@@ -66,6 +67,10 @@ def run(config: Config, state: dict) -> dict:
     if n_sites is not None:
         tail = "  (heterogeneous array — possible hybrid/allopolyploid)" if n_sites else ""
         L += ["", f"ribotype-variant sites: {n_sites}{tail}"]
+    dup = state.get("qc_dup_removed") or []
+    if dup:
+        L += ["", f"QC: collapsed {len(dup)} internal tandem duplication(s) "
+              f"{dup} bp — assembly artifact removed from the unit."]
     report = config.outdir / "report.txt"
     report.write_text("\n".join(L) + "\n")
 

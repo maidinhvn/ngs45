@@ -57,6 +57,44 @@ def _best(hits, kind, strand="+"):
     return max(cand, key=lambda h: h[4]) if cand else None
 
 
+def _collapse_tandem_dup(config: Config, seq: str):
+    """Collapse spurious internal tandem duplications in the unit.
+
+    rRNA genes are single-copy, so a near-identical segment that sits *immediately*
+    after its source (diagonal self-alignment offset == copy length) is a
+    mis-assembly: SPAdes/repeat-resolution occasionally over-extends the LSU trim
+    across a unit junction, duplicating a short stretch (see docs/ASSEMBLY QC). We
+    self-BLAST the unit and, while such an adjacent internal repeat >= dup_min_len
+    at >= dup_min_ident%% remains, drop one copy. Returns (clean_seq, [removed_len]).
+    """
+    removed = []
+    fa = config.workdir / "s4_selfdup.fasta"
+    for _ in range(20):                       # bounded; one copy removed per pass
+        write_fasta([("u", seq)], fa)
+        cp = subprocess.run(
+            ["blastn", "-query", str(fa), "-subject", str(fa),
+             "-outfmt", "6 qstart qend sstart send length pident", "-dust", "no"],
+            check=True, capture_output=True, text=True)
+        best = None                            # (offset, qstart) of shortest tandem
+        for line in cp.stdout.splitlines():
+            f = line.split("\t")
+            if len(f) < 6:
+                continue
+            qs, qe, ss, se, ln = (int(x) for x in f[:5])
+            pid = float(f[5])
+            off = ss - qs                      # diagonal offset (upper triangle)
+            if (off > 0 and ln >= config.dup_min_len and pid >= config.dup_min_ident
+                    and abs(ss - (qe + 1)) <= max(3, off // 5)):  # 2nd copy adjacent
+                if best is None or off < best[0]:
+                    best = (off, qs)
+        if best is None:
+            break
+        off, qs = best
+        seq = seq[:qs - 1] + seq[qs - 1 + off:]
+        removed.append(off)
+    return seq, removed
+
+
 def run(config: Config, state: dict) -> dict:
     _name, seq = read_fasta(state["monomer_raw"])[0]
     out = config.workdir / "s4_monomer.fasta"
@@ -105,7 +143,12 @@ def run(config: Config, state: dict) -> dict:
         return {"monomer": out, "full_repeat": full_out}
 
     unit = dbl[ssu_from - 1:lsu[2]]
+    unit, dup_removed = _collapse_tandem_dup(config, unit)
+    if dup_removed:
+        log.warning("S4: collapsed %d internal tandem duplication(s) %s bp "
+                    "(assembly artifact across a unit junction) -> unit %d bp",
+                    len(dup_removed), dup_removed, len(unit))
     write_fasta([("nrDNA_45S_unit", unit)], out)
     log.info("S4: CM mature-boundary trim -> transcribed unit %d bp "
              "(18S 5' .. 26S 3'); full repeat %d bp", len(unit), period)
-    return {"monomer": out, "full_repeat": full_out}
+    return {"monomer": out, "full_repeat": full_out, "qc_dup_removed": dup_removed}
