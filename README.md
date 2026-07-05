@@ -95,6 +95,21 @@ Run `ngs45 run --help` for all parameters.
 > ~2 min with an essentially identical unit (99.98 % id). Stage 2 variant calling always uses
 > the **full** read depth, so ribotype sensitivity is unaffected by this cap.
 
+### Batch mode
+
+Process a whole folder of samples in one command — ideal for an overnight run:
+
+```bash
+ngs45 batch -i rawdata/ -o out/ -t 8 --call-variants
+```
+
+`batch` auto-detects the layout: paired FASTQs in one flat folder (mates named
+`*_R1/_R2` **or** `*_1/_2`) and/or one subfolder per sample. Each sample is written
+to `out/<sample>/`; a failed sample is logged and skipped, samples already done are
+skipped (so an interrupted run just re-launches), and a `batch_summary.tsv`
+aggregates every sample's unit length, ITS/region lengths, ribotype sites and
+timing. All `run` options (`-t`, `--call-variants`, `--max-cov`, …) apply.
+
 ## Outputs (`outdir/`)
 
 | File | Contents |
