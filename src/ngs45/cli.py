@@ -7,6 +7,7 @@ import logging
 import sys
 
 from . import __version__
+from .batch import run_batch
 from .config import Config, DEFAULT_SEED
 from .external import DependencyError, check_dependencies
 from .pipeline import run_pipeline
@@ -42,6 +43,28 @@ def _build_parser() -> argparse.ArgumentParser:
                    help="map reads back and report ribotype heterogeneity (S6)")
     r.add_argument("--no-resume", action="store_true", help="ignore previous run state")
     r.add_argument("-v", "--verbose", action="store_true")
+
+    # --- batch --------------------------------------------------------------
+    b = sub.add_parser("batch", help="run over every sample in a folder "
+                                     "(auto-detects _R1/_R2 or _1/_2 pairs, flat "
+                                     "or one subfolder per sample)")
+    b.add_argument("-i", "--indir", required=True,
+                   help="folder of samples (flat paired FASTQs and/or subfolders)")
+    b.add_argument("-o", "--outdir", default="ngs45_batch",
+                   help="output root; each sample -> outdir/<sample>/")
+    b.add_argument("-s", "--seed-ref", default=None,
+                   help="45S seed (default: bundled Arabidopsis T2T 45S unit)")
+    b.add_argument("-t", "--threads", type=int, default=4)
+    b.add_argument("--trim", action="store_true", help="quality/adapter trim (cutadapt)")
+    b.add_argument("--bait-rounds", type=int, default=3)
+    b.add_argument("--subsample", type=int, default=0, help="cap recruited pairs (0 = keep all)")
+    b.add_argument("--spades-k", default="auto", help="SPAdes k-mer list (default auto)")
+    b.add_argument("--max-cov", type=int, default=2000, help="cap assembly depth (0 = no cap)")
+    b.add_argument("--call-variants", action="store_true",
+                   help="also report ribotype heterogeneity per sample (S6)")
+    b.add_argument("--no-resume", action="store_true",
+                   help="re-run samples even if their unit already exists")
+    b.add_argument("-v", "--verbose", action="store_true")
 
     # --- check-deps ---------------------------------------------------------
     c = sub.add_parser("check-deps", help="verify external tools are installed")
@@ -95,6 +118,15 @@ def main(argv: list | None = None) -> int:
         )
         run_pipeline(config)
         return 0
+
+    if args.command == "batch":
+        _setup_logging(args.verbose)
+        try:
+            check_dependencies(include_optional=args.call_variants or args.trim)
+        except DependencyError as e:
+            print(e, file=sys.stderr)
+            return 1
+        return run_batch(args)
 
     return 1
 
