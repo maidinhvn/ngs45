@@ -1,159 +1,108 @@
 #!/usr/bin/env python3
-"""Generate manuscript figures for the ngs45 benchmark.
-
-Reads bench/results_summary.tsv (+ benchmark_modern.tsv) and writes PNG+SVG to
-bench/figures/.
-"""
-import csv, os
+"""Regenerate the benchmark figures from bench/master.tsv + bench/results_v3.tsv.
+Outputs PNG (300 dpi) + SVG + PDF into bench/figures/ . Vector formats for the
+manuscript; line-art only (no rasterised panels)."""
+import csv
+from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-FIG = os.path.join(HERE, "figures"); os.makedirs(FIG, exist_ok=True)
+BENCH = Path(__file__).resolve().parent
+FIG = BENCH / "figures"; FIG.mkdir(exist_ok=True)
+plt.rcParams.update({"font.size": 11, "svg.fonttype": "none", "axes.spines.top": False,
+                     "axes.spines.right": False, "font.family": "DejaVu Sans"})
+GREEN, ORANGE, GREY = "#2e7d32", "#ef6c00", "#9e9e9e"
 
-rows = list(csv.DictReader(open(os.path.join(HERE, "results_summary.tsv")), delimiter="\t"))
-def f(x):
-    try: return float(x)
-    except: return None
-for r in rows:
-    r["short"] = r["species"].split("_")[0]
-    r["rl_old"] = f(r["readlen_old"]); r["rl_mod"] = f(r["readlen_modern"])
-    r["pid"] = f(r["unitPID"]); r["ribo"] = f(r["ribo_sites"])
-    r["ok_old"] = r["ngs45_old"] == "Y"; r["ok_mod"] = r["ngs45_modern"] == "Y"
-
-GREEN, RED, BLUE, GREY = "#2ca02c", "#d62728", "#1f77b4", "#888888"
+def load(f):
+    return list(csv.DictReader((BENCH/f).read_text().splitlines(), delimiter="\t"))
 
 def save(fig, name):
-    for ext in ("png", "svg"):
-        fig.savefig(os.path.join(FIG, f"{name}.{ext}"), dpi=300, bbox_inches="tight")
+    for ext in ("png", "svg", "pdf"):
+        fig.savefig(FIG/f"{name}.{ext}", dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print("wrote", name)
 
-# ---- Fig 1: read length determines short-read success --------------------
-fig, ax = plt.subplots(figsize=(7, 4.5))
-FAILY = 99.30  # dedicated row for "not assembled"
-for r in rows:
-    for rl, ok, mk, lab in [(r["rl_old"], r["ok_old"], "o", "old"),
-                            (r["rl_mod"], r["ok_mod"], "s", "modern")]:
-        if rl is None: continue
-        if ok and r["pid"] is not None:
-            ax.scatter(rl, r["pid"], c=GREEN, marker=mk, s=70, edgecolor="k", lw=.5, zorder=3)
-        else:
-            ax.scatter(rl, FAILY, c=RED, marker="x", s=70, zorder=3)
-# arrows old->modern for rescued species
-for r in rows:
-    if r["rl_old"] and r["rl_mod"] and not r["ok_old"] and r["ok_mod"] and r["pid"]:
-        ax.annotate("", xy=(r["rl_mod"], r["pid"]), xytext=(r["rl_old"], FAILY),
-                    arrowprops=dict(arrowstyle="->", color=GREY, lw=1, alpha=.6))
-ax.axvline(150, ls="--", c=BLUE, lw=1.2)
-ax.text(152, 99.55, "150 bp\n(not causal)", color=BLUE, fontsize=8, va="center")
-# annotate Musa (fails even at 309 bp) — short label above its point, no long arrow
-ax.annotate("Musa: fails even at 309 bp\n(high rDNA heterozygosity)",
-            xy=(309, FAILY), xytext=(305, 99.40), fontsize=7.5, color=RED, ha="right",
-            arrowprops=dict(arrowstyle="->", color=RED, lw=.8))
-ax.set_xlabel("Illumina read length (bp)"); ax.set_ylabel("ngs45 unit identity to HiFi (%)")
-ax.set_ylim(99.25, 100.1); ax.set_xlim(60, 330); ax.set_yticks([99.3, 99.5, 99.75, 100.0])
-ax.set_yticklabels(["not\nassembled", "99.5", "99.75", "100"])
-ax.set_title("Old vs modern runs (observational — see titration, Fig 6)")
-from matplotlib.lines import Line2D
-ax.legend(handles=[Line2D([],[],marker="o",color="w",mfc=GREEN,mec="k",label="old run"),
-                   Line2D([],[],marker="s",color="w",mfc=GREEN,mec="k",label="modern run"),
-                   Line2D([],[],marker="x",color=RED,ls="",label="not assembled")],
-          fontsize=8, loc="center right", bbox_to_anchor=(1.0, 0.62))
-save(fig, "Figure1_readlength")
+def sci(s):  # Genus_species -> "G. species" italic label
+    g, *rest = s.split("_")
+    return f"{g[0]}. {' '.join(rest)}"
 
-# ---- Fig 2: success rate old vs modern vs HiFi ---------------------------
-fig, ax = plt.subplots(figsize=(4.6, 4))
-n_old = sum(r["ok_old"] for r in rows); n_mod = sum(r["ok_mod"] for r in rows)
-bars = ax.bar(["ngs45\n(old <150 bp)", "ngs45\n(modern ≥150 bp)", "easy45\n(HiFi)"],
-              [n_old, n_mod, 10], color=[RED, GREEN, BLUE], edgecolor="k")
-for b, v in zip(bars, [n_old, n_mod, 10]):
-    ax.text(b.get_x()+b.get_width()/2, v+.15, f"{v}/10", ha="center", fontweight="bold")
-ax.set_ylabel("species with full 45S unit recovered"); ax.set_ylim(0, 11)
-ax.set_title("Recovery rate (10 species, 9 orders)")
-save(fig, "Figure2_success_rate")
+# ---------- Figure 1: cross-individual concordance ----------
+m = load("master.tsv")
+m.sort(key=lambda r: (r["outcome"] != "full", r["outcome"] != "partial",
+                      -(float(r["ngs_vs_easy_pid"]) if r["ngs_vs_easy_pid"] != "-" else 0)))
+easy_bp = {r["species"]: r["easy45_bp"] for r in load("results_v2.tsv")}
+labels = [sci(r["species"]) for r in m]
+FAILW = 99.12   # short stub width for "no unit" species (visually != 100%)
+fig, ax = plt.subplots(figsize=(7.6, 5.0))
+for i, r in enumerate(m):
+    if r["ngs_vs_easy_pid"] == "-":
+        ax.barh(i, FAILW-99.0, left=99.0, color=GREY, height=0.62)
+        ax.text(FAILW+0.02, i, f"no unit — easy45 recovers ({easy_bp[r['species']]} bp)",
+                va="center", ha="left", fontsize=8.5, color=GREY)
+    else:
+        v = float(r["ngs_vs_easy_pid"])
+        c = GREEN if r["outcome"] == "full" else ORANGE
+        ax.barh(i, v-99.0, left=99.0, color=c, height=0.62)
+        ax.text(v+0.01, i, f"{v:.2f}"+("  (partial)" if r["outcome"]=="partial" else ""),
+                va="center", fontsize=8.5)
+ax.set_xlim(99.0, 100.35); ax.set_yticks(range(len(labels)))
+ax.set_yticklabels(labels, style="italic", fontsize=10)
+ax.invert_yaxis(); ax.set_xlabel("ngs45 unit identity to HiFi/easy45 consensus (%)")
+ax.axvline(100.0, color="k", lw=0.6, ls=":")
+from matplotlib.patches import Patch
+ax.legend(handles=[Patch(color=GREEN, label="full unit (8/12)"),
+                   Patch(color=ORANGE, label="partial — hybrid (1/12)"),
+                   Patch(color=GREY, label="ngs45 no unit → easy45 recovers (3/12)")],
+          loc="upper center", bbox_to_anchor=(0.5, -0.13), ncol=3, fontsize=8.5, frameon=False)
+ax.set_title("Cross-individual benchmark (12 species / 12 orders)", fontsize=11)
+save(fig, "Figure1_concordance")
 
-# ---- Fig 3: ngs45 (short-read) vs easy45 (HiFi) concordance --------------
-ok = [r for r in rows if r["ok_mod"] and r["pid"] is not None]
-ok.sort(key=lambda r: r["pid"])
-fig, ax = plt.subplots(figsize=(6.5, 4))
-cols = [GREEN if r["pid"] >= 99.9 else "#66bd63" for r in ok]
-ax.barh([r["short"] for r in ok], [r["pid"] for r in ok], color=cols, edgecolor="k")
-for i, r in enumerate(ok):
-    ax.text(r["pid"]-.02, i, f'{r["pid"]:.2f}%', va="center", ha="right", fontsize=7.5, color="w")
-ax.set_xlim(99.5, 100.02); ax.axvline(100, ls=":", c=GREY)
-ax.set_xlabel("ngs45 unit identity to HiFi consensus (%)")
-ax.set_title("Short-read ↔ HiFi concordance (modern input)")
-save(fig, "Figure3_concordance")
+# ---------- Figure 2: same-individual identity ----------
+v3 = [r for r in load("results_v3.tsv")]
+labels2 = [sci(r["species"]) for r in v3]
+vals2, cols2, txt = [], [], []
+for r in v3:
+    if r["same_indiv_pid"] == "-":
+        vals2.append(100.0); cols2.append(GREY); txt.append("easy45 no consensus")
+    else:
+        v = float(r["same_indiv_pid"]); vals2.append(v); cols2.append(GREEN)
+        txt.append("100.00 (0 mismatch)" if v == 100.0 else f"{v:.3f}")
+fig, ax = plt.subplots(figsize=(7.2, 3.6))
+y = range(len(labels2))
+ax.barh(list(y), [v-99.5 for v in vals2], left=99.5, color=cols2, height=0.6)
+ax.set_xlim(99.5, 100.1); ax.set_yticks(list(y)); ax.set_yticklabels(labels2, style="italic", fontsize=10)
+ax.invert_yaxis(); ax.set_xlabel("ngs45 unit identity to easy45 consensus, SAME individual (%)")
+ax.axvline(100.0, color="k", lw=0.6, ls=":")
+for i, (v, t, c) in enumerate(zip(vals2, txt, cols2)):
+    ax.text((99.52 if c == GREY else v+0.005), i, t, va="center", ha="left",
+            fontsize=8.5, color=("white" if c == GREY else "k"),
+            fontweight=("bold" if c == GREY else "normal"))
+ax.set_title("Same-individual validation — no intraspecific confound", fontsize=11)
+save(fig, "Figure2_same_individual")
 
-# ---- Fig 4: ribotype heterozygosity vs consensus identity ----------------
-pts = [r for r in rows if r["ok_mod"] and r["ribo"] is not None and r["pid"] is not None]
-fig, ax = plt.subplots(figsize=(6, 4.3))
-xs = [r["ribo"] for r in pts]; ys = [r["pid"] for r in pts]
-ax.scatter(xs, ys, c=BLUE, s=70, edgecolor="k", zorder=3)
-# stagger labels so near-identical points (e.g. Beta/Glycine at 100%) don't overlap
-_off = {"Beta": (5, 4), "Glycine": (5, -12), "Solanum": (-8, 6), "Sesamum": (6, -12)}
-for r in pts:
-    dx, dy = _off.get(r["short"], (6, 3))
-    ax.annotate(r["short"], (r["ribo"], r["pid"]), textcoords="offset points",
-                xytext=(dx, dy), fontsize=7.5)
-# trend line
-if len(xs) > 2:
-    import numpy as np
-    b, a = np.polyfit(xs, ys, 1)
-    xr = np.array([min(xs), max(xs)])
-    ax.plot(xr, a + b*xr, ls="--", c=RED, lw=1, label=f"trend (slope {b:.3f}%/site)")
-    ax.legend(fontsize=8)
-ax.set_xlabel("ribotype_sites (intragenomic heterozygosity)")
-ax.set_ylabel("ngs45 unit identity to HiFi (%)")
-ax.set_title("More ribotype heterogeneity → blended consensus, lower identity")
-save(fig, "Figure4_ribotype")
+# ---------- Figure 3: read length vs outcome ----------
+fig, ax = plt.subplots(figsize=(7.6, 4.6))
+oc_c = {"full": GREEN, "partial": ORANGE, "fail": "#c62828"}
+# per-species label offset (dx,dy in points) + alignment, to avoid collisions
+OFF = {"Actinidia_chinensis": (7, 9, "left"), "Fragaria_vesca": (6, -13, "left"),
+       "Vitis_vinifera": (8, 2, "left"), "Helianthus_annuus": (8, -2, "left"),
+       "Solanum_lycopersicum": (8, 4, "left"), "Musa_acuminata": (8, 2, "left")}
+for r in m:
+    x = float(r["ill_len"]); yv = float(r["ill_q30"])
+    ax.scatter(x, yv, s=75, color=oc_c[r["outcome"]], edgecolor="k", lw=0.4, zorder=3)
+    dx, dy, ha = OFF.get(r["species"], (5, 4, "left"))
+    ax.annotate(sci(r["species"]), (x, yv), fontsize=7.5, style="italic", ha=ha,
+                xytext=(dx, dy), textcoords="offset points")
+ax.axvline(150, color=GREY, ls="--", lw=0.8)
+ax.text(150, 100.6, "150 bp", fontsize=8, color=GREY, ha="center")
+ax.set_ylim(77, 101.5); ax.set_xlim(72, 262)
+ax.set_xlabel("Illumina read length (bp)"); ax.set_ylabel("Illumina bases ≥ Q30 (%)")
+ax.legend(handles=[Patch(color=GREEN, label="full"), Patch(color=ORANGE, label="partial"),
+                   Patch(color="#c62828", label="fail (short reads can't span)")],
+          loc="lower right", fontsize=8.5, frameon=False)
+ax.set_title("Recovery vs read length & quality", fontsize=11)
+save(fig, "Figure3_readlength")
 
-# ---- Fig 5: QC metrics do NOT separate assembled vs not (Illumina) ----------
-qc = list(csv.DictReader(open(os.path.join(HERE, "qc_all_datasets.tsv")), delimiter="\t"))
-ill = [q for q in qc if q["role"].startswith("Illumina")]
-fig, ax = plt.subplots(figsize=(7, 4.6))
-for q in ill:
-    rl = f(q["avg_readlen"]); aq = f(q["AvgQual"])
-    if rl is None or aq is None: continue
-    ok = q["ngs45_outcome"] == "assembled"
-    old = q["role"].endswith("old")
-    ax.scatter(rl, aq, s=90, zorder=3,
-               marker=("o" if ok else "X"),
-               c=(GREEN if ok else RED),
-               edgecolor="k", lw=.6, alpha=.9)
-    ax.annotate(q["species"].split("_")[0], (rl, aq), textcoords="offset points",
-                xytext=(6, 3), fontsize=6.5, color=("#333" if old else BLUE))
-ax.set_xlabel("read length (bp)"); ax.set_ylabel("mean base quality (Phred)")
-ax.set_title("Standard QC does not predict assembly success (Illumina runs)")
-from matplotlib.lines import Line2D
-ax.legend(handles=[Line2D([],[],marker="o",color="w",mfc=GREEN,mec="k",label="assembled"),
-                   Line2D([],[],marker="X",color="w",mfc=RED,mec="k",label="not assembled")],
-          fontsize=8, loc="lower right", title="ngs45 outcome")
-ax.text(0.02, 0.03, "fails (red) and successes (green) overlap in QC space\n"
-        "→ read length + base quality alone do not explain the failures",
-        transform=ax.transAxes, fontsize=7.5, style="italic", va="bottom")
-save(fig, "Figure5_QC")
-
-# ---- Fig 6: controlled read-length titration (one clean dataset) ------------
-tt = list(csv.DictReader(open(os.path.join(HERE, "trunc_titration.tsv")), delimiter="\t"))
-L = [f(r["trunc_len"]) for r in tt]; U = [f(r["ngs45_unit"]) for r in tt]
-fig, ax = plt.subplots(figsize=(6.6, 4))
-ax.plot(L, U, "-o", c=GREEN, mec="k", ms=8, lw=1.5, zorder=3)
-ax.axvline(150, ls="--", c=GREY, lw=1)
-ax.set_ylim(0, 6500)
-ax.set_xlabel("read length after in-silico truncation (bp)")
-ax.set_ylabel("ngs45 unit recovered (bp)")
-ax.set_title("Controlled titration: read length is NOT limiting on clean data")
-ax.text(0.5, 0.12,
-        "same reads (Oryza DRR160520), truncated;\n"
-        "full 5783 bp unit at 99.88% to HiFi down to 60 bp\n"
-        "→ the ~150 bp 'threshold' was a cross-dataset confound",
-        transform=ax.transAxes, fontsize=8, ha="center", style="italic")
-for r in tt:
-    ax.annotate(f'{r["ngs45_unit"]}bp', (f(r["trunc_len"]), f(r["ngs45_unit"])),
-                textcoords="offset points", xytext=(0, 8), fontsize=6.5, ha="center")
-save(fig, "Figure6_titration")
-
-print("all figures ->", FIG)
+print("figures written to", FIG)
+for p in sorted(FIG.glob("*.png")):
+    print(" ", p.name)

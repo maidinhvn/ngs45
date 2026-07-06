@@ -1,0 +1,21 @@
+idx	category	species	order	ngs_accession	ngs_platform	hifi_ref	validation	notes
+1	benchmark	Beta_vulgaris	Caryophyllales	SRR29552944	Illumina	SRR37382116	HiFi+GenBank	kept from v1
+2	benchmark	Citrus_sinensis	Sapindales	SRR33854505	Illumina	SRR27236983	HiFi+GenBank	kept from v1
+3	benchmark	Glycine_max	Fabales	SRR11929797	Illumina	SRR38619744	HiFi+GenBank	kept from v1
+4	benchmark	Helianthus_annuus	Asterales	SRR8888860	Illumina	SRR14782853	HiFi+GenBank	kept from v1
+5	benchmark	Musa_acuminata	Zingiberales	SRR25581090	Illumina	SRR23425448	HiFi+GenBank	kept from v1; heterozygous (ribotype)
+6	benchmark	Oryza_sativa	Poales	DRR160520	Illumina	SRR13280199	HiFi+GenBank	kept from v1
+7	benchmark	Sesamum_indicum	Lamiales	DRR806862	Illumina	SRR21601246	HiFi+GenBank	kept from v1
+8	benchmark	Solanum_lycopersicum	Solanales	DRR040154	Illumina	SRR15243717	HiFi+GenBank	kept from v1
+9	benchmark	Vitis_vinifera	Vitales	ERR15002908	Illumina	ERR17353932	HiFi+GenBank	kept from v1
+10	benchmark	Fragaria_vesca	Rosales	ERR14008837	Illumina	SRR38138057	HiFi+GenBank	NEW (v2)
+11	benchmark	Actinidia_chinensis	Ericales	SRR29894970	Illumina	SRR24236049	HiFi+GenBank	NEW (v2)
+12	benchmark	Populus_trichocarpa	Malpighiales	SRR37518787	Illumina	SRR37518457	HiFi+GenBank	NEW (v2)
+13	application	Polyscias_balfouriana	Apiales	IM241218-8	Illumina	-	GenBank_ITS	local (T.H. Vu); Araliaceae
+14	application	Polyscias_cumingiana	Apiales	IM250605-1	Illumina	-	GenBank_ITS	local (T.H. Vu)
+15	application	Polyscias_filicifolia	Apiales	IM240312-1	Illumina	-	GenBank_ITS	local (T.H. Vu)
+16	application	Polyscias_guifoylei_green	Apiales	IM241218-7	Illumina	-	GenBank_ITS	local (T.H. Vu)
+17	application	Polyscias_guifoylei_var_quinquefolia	Apiales	IM241218-6	Illumina	-	GenBank_ITS	local (T.H. Vu)
+18	application	Polyscias_guifoylei_white	Apiales	IM241218-5	Illumina	-	GenBank_ITS	local (T.H. Vu)
+19	application	Polyscias_scutellaria	Apiales	IM241218-4	Illumina	-	GenBank_ITS	local (T.H. Vu)
+20	application	Polyscias_serrata	Apiales	IM241218-9	Illumina	-	GenBank_ITS	local (T.H. Vu)

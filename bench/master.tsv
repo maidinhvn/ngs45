@@ -1,0 +1,13 @@
+species	order	ngs_vs_easy_pid	outcome	ill_len	ill_q30	hifi_n50	hifi_q30	same_indiv_pid
+Beta_vulgaris	Caryophyllales	100.000	full	150.0	93	17136	95	100.000
+Helianthus_annuus	Asterales	-	fail	150.0	91	21826	100	-
+Solanum_lycopersicum	Solanales	100.000	full	91.0	98	19051	96	-
+Sesamum_indicum	Lamiales	100.000	full	150.0	95	16969	96	100.000
+Citrus_sinensis	Sapindales	99.760	full	151.0	89	19676	96	99.846
+Glycine_max	Fabales	100.000	full	149.7	94	15622	95	-
+Fragaria_vesca	Rosales	99.880	full	99.9	94	12407	96	-
+Populus_trichocarpa	Malpighiales	100.000	full	151.0	92	14706	97	100.000
+Vitis_vinifera	Vitales	-	fail	151.0	79	9005	95	-
+Actinidia_chinensis	Ericales	-	fail	85.3	94	10504	98	-
+Oryza_sativa	Poales	99.879	full	250.0	95	20215	100	100.000
+Musa_acuminata	Zingiberales	99.530	partial	100.0	100	13023	98	100.000

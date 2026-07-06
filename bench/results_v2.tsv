@@ -1,0 +1,13 @@
+species	order	ngs45_bp	easy45_bp	ngs_vs_easy_pid	its_vs_GB_pid	GB_acc	outcome
+Beta_vulgaris	Caryophyllales	5811	5811	100.000	99.671	PZ361546.1	full
+Helianthus_annuus	Asterales	-	5857	-	-	PP232226.1	fail
+Solanum_lycopersicum	Solanales	5800	5800	100.000	100.000	PZ387679.1	full
+Sesamum_indicum	Lamiales	5798	5798	100.000	92.988	OM746326.1	full
+Citrus_sinensis	Sapindales	5844	5844	99.760	99.836	PV589351.1	full
+Glycine_max	Fabales	5799	5799	100.000	99.664	PP060534.1	full
+Fragaria_vesca	Rosales	5829	5828	99.880	99.621	PZ361553.1	full
+Populus_trichocarpa	Malpighiales	5794	5794	100.000	98.653	JQ898636.1	full
+Vitis_vinifera	Vitales	-	5877	-	-	OQ519992.1	fail
+Actinidia_chinensis	Ericales	-	5834	-	-	OR516785.1	fail
+Oryza_sativa	Poales	5783	5782	99.879	-	PZ572868.1	full
+Musa_acuminata	Zingiberales	3861	5804	99.530	97.623	PZ437810.1	partial
