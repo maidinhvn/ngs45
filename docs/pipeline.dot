@@ -20,10 +20,10 @@ digraph ngs45 {
   node [shape=box, style="rounded,filled", fillcolor="#fef7e0", color="#e8a33d"];
   s0 [label="S0  QC / trim reads\ncutadapt  (optional)"];
   s1 [label="S1  Bait rDNA reads\nbowtie2 — iterative recruitment vs 45S seed"];
-  s2 [label="S2  Assemble recruited reads\nSPAdes multi-k  (k < read length)",
+  s2 [label="S2  Assemble recruited reads\nSPAdes multi-k  (k < read length)   ·   coverage cap (--max-cov, optional)",
       fillcolor="#fbbc04", color="#b06000", penwidth=2.0];
   s3 [label="S3  Resolve one repeat unit\nBLAST seed vs contigs + scaffolds"];
-  s4 [label="S4  Orient & trim to mature unit (18S 5'-26S 3')\ncmsearch vs Rfam SSU+LSU CMs"];
+  s4 [label="S4  Orient & trim to mature unit (18S 5'-26S 3')\ncmsearch vs Rfam SSU+LSU CMs  →  collapse tandem-dup (QC)"];
   s5 [label="S5  Annotate + ITS barcode\nITSx (18S / ITS1 / 5.8S / ITS2 / 26S) — barrnap fallback"];
   s6 [label="S6  Ribotype heterozygosity\nbwa | samtools | bcftools  (optional)"];
   s7 [label="S7  Summary + report"];
