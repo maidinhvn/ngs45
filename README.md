@@ -133,19 +133,26 @@ philosophy.
 
 ## Benchmark & scope
 
-Cross-validated against HiFi/easy45 and GenBank on 10 species across 9 angiosperm
-orders. With **modern ≥150 bp PE reads ngs45 recovers the unit for 9/10 species**,
-**99.75–100 % identical to the HiFi consensus** (several at 0 mismatches) and
-100 % to GenBank ITS. See [docs/BENCHMARK.md](docs/BENCHMARK.md) and [figures](docs/FIGURES.md); all data IDs in [docs/DATA_ACCESSIONS.md](docs/DATA_ACCESSIONS.md).
+Cross-validated against **easy45 / PacBio HiFi** and GenBank across 12 species / 12
+angiosperm orders, on two tiers ([docs/BENCHMARK.md](docs/BENCHMARK.md), [figures](docs/FIGURES.md);
+data IDs in [docs/DATA_ACCESSIONS.md](docs/DATA_ACCESSIONS.md)):
+
+- **Same individual** (HiFi + Illumina from the same plant, 7 species): **6/7
+  concordant, 5 base-identical (0 mismatch), mean ≈ 99.98 %** — the short-read unit
+  *is* the HiFi molecule, with no intraspecific confound.
+- **Cross-individual** (12 species): ngs45 recovers the full unit for **8/12 at
+  99.76–100 % identity to HiFi** (9/12 given ≥150 bp reads), 1 partial (*Musa*,
+  hybrid), and 2 short-read limits (*Helianthus*, *Vitis*) that easy45 recovers.
 
 Scope ([docs/ASSEMBLY_LIMITATION.md](docs/ASSEMBLY_LIMITATION.md), [docs/QC.md](docs/QC.md)):
 
-- **Not read-length limited.** A controlled titration recovers the same unit down
-  to 60 bp on clean data; the apparent "≥150 bp" pattern across public runs is a
-  cross-dataset confound (QC metrics do not predict success).
-- **The intrinsic limit is rDNA heterozygosity** — reported as `ribotype_sites`
-  (`--call-variants`). When it is high (hybrids/allopolyploids, e.g. *Musa*), the
-  short-read consensus blends ribotypes; prefer HiFi + easy45.
+- **Read length ≥150 bp is needed but not sufficient.** A same-species control
+  (*Actinidia*: 85 bp fails, 150 bp gives the full unit at 99.93 %) shows short reads
+  must be long enough; but *Helianthus* and *Vitis* fail even at 150 bp because their
+  transcribed-unit spacers are too divergent for short reads to span — use HiFi/easy45.
+- **rDNA heterozygosity** — reported as `ribotype_sites` (`--call-variants`). When it
+  is high (hybrids/allopolyploids), the short-read consensus blends ribotypes;
+  prefer HiFi + easy45 for full ribotype phasing.
 
 ## Install from source
 

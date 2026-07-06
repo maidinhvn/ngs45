@@ -1,49 +1,51 @@
 # Scope & limits of ngs45 (short-read 45S nrDNA assembly)
 
-> Revision history — two earlier conclusions in this file were wrong and were
-> corrected by controlled experiments:
-> 1. First draft: "a fundamental limitation of short-read assembly." Wrong —
->    modern-read runs recover 9/10.
-> 2. Second draft: "requires ≥150 bp reads." Also wrong — a controlled
->    read-length titration shows ngs45 works down to **60 bp** on clean data
->    (`QC.md`, `bench/trunc_titration.tsv`).
-> The account below is what the controlled experiments actually support.
+> Revision history — earlier drafts of this file over-generalised from single-species
+> tests and have been corrected against the 2026-07 cross-individual + same-individual
+> benchmark:
+> 1. "a fundamental limitation of short-read assembly" — too strong; ngs45 recovers
+>    8/12 species (9/12 with ≥150 bp reads), base-identical to HiFi on the same plant.
+> 2. "works down to 60 bp" — that came from truncating one easy species (*Oryza*) and
+>    does not generalise: *Actinidia* fails at 85 bp and succeeds at 150 bp.
+> 3. "*Musa* fails — intrinsic heterozygosity" — wrong: on same-individual data ngs45
+>    recovers *Musa*'s unit at 100 % (0 mismatch); the earlier partial was a data
+>    artefact. The consensus is recoverable; only ribotype *phasing* needs HiFi.
 
-## What is (and isn't) the limit
+## What sets the limit — divergent spacers, via read length
 
-**Read length is NOT a limit** (on adequate data). One clean run
-(*Oryza sativa* DRR160520) truncated in-silico to 250→60 bp — everything else held
-constant — gave the identical 5783 bp unit at 99.88 % to HiFi at **every** length,
-down to 60 bp. So the "~150 bp threshold" seen when comparing old vs modern *runs*
-was a **cross-dataset confound**, not causation.
+Short reads recover the unit by assembling through the transcribed spacers
+(ETS/ITS1/ITS2) and, for baiting, the IGS. Whether they can depends on **how
+divergent those spacers are** relative to the read length:
 
-**Standard QC does not predict success either.** Across the old Illumina runs,
-assembled and failed cases overlap completely in (read length × base quality)
-space — e.g. *Sesamum* (mean Q 7.6) assembles while *Beta*/*Vitis* (mean Q ~25)
-fail. See `QC.md` / Figure 5. Public runs differ simultaneously in length, error,
-coverage, individual, contamination and rDNA heterozygosity, so a post-hoc
-attribution to any single factor is not defensible.
+- **Read length is necessary but not sufficient.** Same-species control on
+  *Actinidia chinensis* (same HiFi reference): an **85 bp** library fails (best contig
+  3603 bp), a **150 bp** library gives the full 5834 bp unit at 99.93 %. So reads must
+  be long enough — but 150 bp is not always enough: *Helianthus* and *Vitis* fail at
+  150–151 bp because their spacers are too divergent for any short read to span.
+- **QC alone does not predict it** ([QC.md](QC.md)): short-but-clean libraries succeed
+  (*Solanum* 91 bp, *Fragaria* 100 bp) while some 150 bp libraries fail. Read length
+  and %Q30 intermix across success/failure.
 
-**The one intrinsic limit — extreme intragenomic rDNA heterozygosity.**
-*Musa acuminata* fails even with 309 bp reads (the longest run tested) and also
-defeats GetOrganelle; only HiFi/easy45 recovers it (5804 bp). Its rDNA array is so
-heterogeneous that no short read spans/phases the divergent copies. ngs45 flags
-this as a high `ribotype_sites` count (`--call-variants`); as heterozygosity rises
-the majority-vote consensus blends ribotypes and its identity to any single
-reference drops (Figure 4). This is biology, not a fixable assembly parameter.
+When short reads cannot span the divergent spacers, ngs45 stops cleanly at S3 (best
+rDNA contig < 4000 bp) rather than emit a wrong unit — and **easy45/HiFi recovers
+those species in full** (each HiFi read spans the whole repeat).
 
 ## What short reads can and cannot deliver
-- **Can:** the consensus 45S unit (base-identical to HiFi where the array is
-  homogeneous) + a *site-level* heterozygosity profile (`ribotype_sites`,
-  per-site allele fractions).
-- **Cannot:** the distinct, full-length ribotype haplotypes — no short read (or
-  pair) spans the ~6 kb unit to phase them. That needs long reads.
+
+- **Can:** the consensus 45S unit — base-identical to the HiFi consensus where the
+  array is homogeneous (5/7 same-individual species at 0 mismatch) — plus a
+  *site-level* heterozygosity profile (`ribotype_sites`, per-site allele fractions
+  from `--call-variants`).
+- **Cannot:** the distinct, full-length ribotype haplotypes. No short read (or pair)
+  spans the ~6 kb unit to phase divergent copies into separate molecules — that needs
+  long reads (easy45). This holds even when the consensus itself is recovered (e.g.
+  *Musa*: consensus recovered, but per-ribotype phasing still needs HiFi).
 
 ## Practical guidance
-- ngs45 recovers the unit from adequate short-read data across diverse taxa,
-  matching HiFi and GenBank at 99.75–100 %. It is not read-length limited in any
-  range you are likely to encounter (≥60 bp works on clean data).
-- Some individual public runs fail for dataset-specific reasons that QC does not
-  reveal; if a run fails, try another library for that species.
-- For hybrids/allopolyploids or whenever `ribotype_sites` is high, prefer
-  **HiFi + easy45**, which reads each ribotype as one intact molecule.
+
+- Use **≥150 bp** paired reads. ngs45 then recovers the unit across diverse taxa,
+  matching HiFi/GenBank at 99.76–100 %.
+- If a run fails at S3 (contig too short), the species' spacers are likely too
+  divergent for short reads — use **HiFi + easy45** for that species.
+- For hybrids/allopolyploids or whenever `ribotype_sites` is high, prefer HiFi +
+  easy45 for full ribotype phasing.

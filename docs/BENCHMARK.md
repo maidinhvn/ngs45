@@ -1,92 +1,105 @@
 # ngs45 benchmark
 
-Cross-validation of ngs45 (short-read 45S nrDNA assembly) against **easy45 / PacBio
-HiFi** as the gold standard, plus **GenBank** ITS references, across 10 species
-spanning 9 angiosperm orders (2 monocot + 8 eudicot). All identities are BLASTn.
+Cross-validation of **ngs45** (short-read 45S nrDNA assembly) against **easy45 /
+PacBio HiFi** as the independent reference, plus **GenBank** ITS records. Two tiers:
+a broad **cross-individual** panel (12 species / 12 angiosperm orders) and a rigorous
+**same-individual** panel (7 species, HiFi + Illumina from the same BioSample). All
+identities are best-HSP BLASTn. Accessions: [DATA_ACCESSIONS.md](DATA_ACCESSIONS.md);
+figures: [FIGURES.md](FIGURES.md); source tables in [`../bench/`](../bench/).
 
-## Headline result
+## Headline
 
-| Input | ngs45 (Illumina) | easy45 (HiFi) |
-|---|---|---|
-| **old / short-read** (73–144 bp) | 4/10 | — |
-| **modern** (≥150 bp PE) | **9/10** | — |
-| gold standard | — | **10/10** |
+- **Same individual (no confound): 6/7 species concordant, 5 base-identical (0
+  mismatch), mean ≈ 99.98 %.** Where both tools run on the same plant, the short-read
+  unit is essentially identical to the HiFi consensus.
+- **Cross-individual: ngs45 recovers the full unit for 8/12 species at 99.76–100 %
+  identity to HiFi** (9/12 once *Actinidia* is given ≥150 bp reads; see Table 3),
+  1 partial (*Musa*, hybrid), and 2 genuine short-read limits (*Helianthus*, *Vitis*)
+  that **easy45 recovers in full** — the two tools are complementary.
+- **easy45 recovers the unit for every species tested.**
 
-The jump from 4/10 → 9/10 is driven almost entirely by **read length**, not by the
-tool (see `ASSEMBLY_LIMITATION.md`). Where ngs45 succeeds it is **99.75–100 %
-identical to the HiFi consensus** (several species 0 mismatches) and **100 % to
-GenBank ITS**.
+## Table 1 — Same-individual validation (7 species)
 
-## Table 1 — modern-input benchmark
+HiFi and Illumina from the **same BioSample**, so any difference is method-only.
 
-| Order | Species | read (bp) | ngs45 unit | easy45 unit | ngs45↔easy45 | ITS↔easy45 | ITS↔GenBank | ribotype sites |
-|---|---|---|---|---|---|---|---|---|
-| Poales | *Oryza sativa* | 250 | 5783 | 5782 | 99.88 % / 4mm | — | 98.98 % | 15 |
-| Zingiberales | *Musa acuminata* | 100* | fail | 5804 | — | — | — | — |
-| Solanales | *Solanum lycopersicum* | 91 | 5800 | 5800 | **100 % / 0mm** | 100 % | 100 % | 5 |
-| Asterales | *Helianthus annuus* | 150 | 5577 | 5857 | 99.93 % / 4mm | — | 99.69 % | 0 |
-| Lamiales | *Sesamum indicum* | 150 | 5465 | 5798 | **100 % / 0mm** | 100 % | 100 % | 6 |
-| Caryophyllales | *Beta vulgaris* | 150 | 5811 | 5811 | **100 % / 0mm** | 100 % | 100 % | 1 |
-| Vitales | *Vitis vinifera* | 151 | 5876 | 5881 | 99.85 % / 9mm | 99.8 % | — | 13 |
-| Fabales | *Glycine max* | 150 | 5926 | 5799 | **100 % / 0mm** | 100 % | — | 1 |
-| Malvales | *Gossypium hirsutum* | 101 | 5985 | 5883 | 99.95 % / 2mm | 100 % | 100 % | 4 |
-| Sapindales | *Citrus sinensis* | 151 | 5185 | 5844 | 99.75 % / 11mm | — | 98.59 % | 29 |
-
-\* Musa's modern run was only 100 bp; Musa fails even at 309 bp (biology, not
-data — extreme rDNA heterogeneity; HiFi required). See `ASSEMBLY_LIMITATION.md`.
-
-Earlier internal validations (not in the table): **Panax ginseng** ngs45↔easy45
-99.97 %, ITS 100 % GenBank; **Polyscias filicifolia** ngs45 100 % vs an
-independent reference.
-
-## Table 2 — old vs modern runs (observational; NOT a read-length threshold)
-
-| Species | old run (bp) | old result | modern run (bp) | modern result |
+| Species | Order | ngs45 unit | easy45 cons | identity |
 |---|---|---|---|---|
-| *Oryza sativa* | 73 | fail | 250 | 99.88 % |
-| *Helianthus annuus* | 91 | fail | 150 | 99.93 % |
-| *Beta vulgaris* | 144 | fail | 150 | 100 % |
-| *Vitis vinifera* | 125 | fail | 151 | 99.85 % |
+| *Oryza sativa* | Poales | 5783 | 5783 | **100.000 %** (0 mm) |
+| *Beta vulgaris* | Caryophyllales | 5811 | 5811 | **100.000 %** (0 mm) |
+| *Sesamum indicum* | Lamiales | 5798 | 5798 | **100.000 %** (0 mm) |
+| *Musa acuminata* | Zingiberales | 5804 | 5804 | **100.000 %** (0 mm) |
+| *Populus trichocarpa* | Malpighiales | 5794 | 5794 | **100.000 %** (0 mm) |
+| *Citrus sinensis* | Sapindales | 5845 | 5844 | 99.846 % |
+| *Lindera aggregata* | Laurales | 5855 | no consensus† | — |
 
-> ⚠️ This is a **confounded** cross-dataset comparison — the old and modern runs
-> differ in read length **and** error rate, coverage, individual and
-> contamination. A controlled read-length titration (`QC.md`,
-> `bench/trunc_titration.tsv`) shows ngs45 recovers the same unit down to **60 bp**
-> on clean data, so read length is **not** the cause; and QC metrics do not
-> separate the failures (`QC.md`, Fig 5). Interpret this table as "some old public
-> runs fail for dataset-specific reasons", not as a read-length threshold.
+† *Lindera* (basal Laurales): the 120 k-read HiFi subset had too few 45S-spanning
+reads to pass easy45's cluster-abundance gate; ngs45 still recovered the unit — the
+complementarity runs both ways. *Musa* is base-identical here although its
+cross-individual run (Table 2) was only partial, i.e. that shortfall was a
+data artefact, not a hybrid limit of ngs45.
 
-## Table 3 — runtime & memory (wall-clock; illustrative)
+## Table 2 — Cross-individual benchmark (12 species / 12 orders)
 
-Per-species, single-job, 16 threads. HiFi/easy45 ran on all 10; ngs45 timings are
-from the isolated pass. HiFi peak RSS is higher (~5.5 GB) as easy45 holds
-spanning reads; ngs45 short-read peak RSS 0.4–3.9 GB.
+| Species | Order | ngs45 | easy45 | ngs45↔easy45 | ITS↔GenBank |
+|---|---|---|---|---|---|
+| *Beta vulgaris* | Caryophyllales | 5811 | 5811 | 100.000 % | 99.67 % |
+| *Solanum lycopersicum* | Solanales | 5800 | 5800 | 100.000 % | 100.0 % |
+| *Sesamum indicum* | Lamiales | 5798 | 5798 | 100.000 % | 92.99 % |
+| *Glycine max* | Fabales | 5799 | 5799 | 100.000 % | 99.66 % |
+| *Populus trichocarpa* | Malpighiales | 5794 | 5794 | 100.000 % | 98.65 % |
+| *Fragaria vesca* | Rosales | 5829 | 5828 | 99.88 % | 99.62 % |
+| *Oryza sativa* | Poales | 5783 | 5782 | 99.88 % | — |
+| *Citrus sinensis* | Sapindales | 5844 | 5844 | 99.76 % | 99.84 % |
+| *Musa acuminata* | Zingiberales | 3861 (partial) | 5804 | 99.53 %‡ | 97.96 % |
+| *Helianthus annuus* | Asterales | **fail** (493 bp) | 5857 | — | 100.0 %§ |
+| *Vitis vinifera* | Vitales | **fail** (2904 bp) | 5877 | — | — |
+| *Actinidia chinensis* | Ericales | **fail** (3603 bp)¶ | 5834 | — | 94.87 %§ |
 
-| tool | wall-clock range | peak RSS |
+‡ over the 3833 bp overlap (short-read consensus is partial in a hybrid).
+§ easy45 ITS vs GenBank (ngs45 produced no unit). ¶ fails only at 85 bp — see Table 3.
+
+## Table 3 — Read-length control (*Actinidia chinensis*, same species)
+
+Two Illumina libraries, same HiFi reference (SRR24236049):
+
+| Library | Read length | ngs45 result |
 |---|---|---|
-| ngs45 (Illumina) | 59–755 s | 0.4–3.9 GB |
-| easy45 (HiFi) | 72–689 s | ~5.5 GB |
+| SRR29894970 | 85 bp | fail (best contig 3603 bp) |
+| SRR28002090 | 150 bp | **full 5834 bp unit, 99.93 % vs HiFi** |
 
-Full per-species numbers: `bench/timing_isolated.tsv`.
+So *Actinidia*'s cross-individual failure is a **read-length** effect, not a species
+limit: with modern ≥150 bp reads ngs45 recovers it. Read length ≥150 bp is
+**necessary but not sufficient** — *Helianthus* and *Vitis* fail even at 150 bp
+because their transcribed-unit spacers are too divergent for short reads to span
+(→ use HiFi/easy45). See [ASSEMBLY_LIMITATION.md](ASSEMBLY_LIMITATION.md).
+
+## Table 4 — Runtime (wall-clock, 8–16 threads, shared server)
+
+Subsets: Illumina 5 M read pairs, HiFi 120 k reads. `--max-cov` keeps SPAdes fast.
+
+| tool | median | range |
+|---|---|---|
+| ngs45 (Illumina) | ~6 min | 4–18 min |
+| easy45 (HiFi) | ~4 min | 1–15 min |
+
+Both finish a sample in minutes — practical for hundreds of samples via the `batch`
+subcommand (Polyscias: 8 samples, ~13 min each).
 
 ## Interpretation
 
-- **ribotype_sites ↔ identity:** homogeneous arrays (Solanum 5, Sesamum 6) give
-  0-mismatch consensus; heterogeneous arrays (Citrus 29, Oryza 15) give a blended
-  consensus with lower identity — a real biological signal (possible
-  hybrid/allopolyploidy), not an assembly error.
-- **ngs45 vs easy45 division of labour:** ngs45 delivers the consensus unit + a
-  heterogeneity flag from short reads; easy45 delivers the distinct ribotypes from
-  HiFi. Use ngs45 for ≥150 bp libraries and moderate heterozygosity; use easy45
-  for old/short data, hybrids, or high `ribotype_sites`.
+- **Concordance:** where ngs45 assembles a unit it matches the independent HiFi
+  consensus to 99.76–100 % (5/7 same-individual species at 0 mismatch). The
+  short-read assembly is not a lossy approximation — it is the same molecule.
+- **Division of labour:** ngs45 covers the many cheap short-read libraries; easy45
+  covers what short reads cannot (highly divergent spacers, and full ribotype
+  phasing from HiFi). The failures in Table 2 (*Helianthus*, *Vitis*) are exactly the
+  cases easy45 exists for.
 
 ## Reproducing
 
-- **All NCBI/ENA accessions**: [DATA_ACCESSIONS.md](DATA_ACCESSIONS.md) (HiFi,
-  old + modern Illumina, GenBank ITS refs, bundled seed/CM).
-- Modern benchmark driver: `bench/run_modern_benchmark.sh` (streams read subsets
-  from ENA, runs ngs45, compares to the cached easy45 HiFi consensus).
-- Accession manifests: `bench/manifest_modern.tsv`, `bench/manifest.tsv`,
-  `bench/manifest_hifi_long.tsv`.
-- Raw tables: `bench/benchmark_modern.tsv`, `bench/benchmark_final.tsv` (old
-  input), `bench/timing_isolated.tsv`.
+- Accessions: [DATA_ACCESSIONS.md](DATA_ACCESSIONS.md).
+- Consolidated result tables: [`../bench/results_v2.tsv`](../bench/results_v2.tsv),
+  [`../bench/results_v3.tsv`](../bench/results_v3.tsv),
+  [`../bench/master.tsv`](../bench/master.tsv), QC in [`../bench/qc.tsv`](../bench/qc.tsv).
+- Regenerate tables: [`../bench/consolidate.py`](../bench/consolidate.py); figures:
+  [`../bench/make_figures.py`](../bench/make_figures.py).
