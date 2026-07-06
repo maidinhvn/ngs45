@@ -102,7 +102,11 @@ def run(config: Config, state: dict) -> dict:
     klist = _klist_for(readlen, config.spades_klist)
     r1, r2 = _cap_coverage(config, r1, r2, readlen)
 
-    cmd = ["spades.py", "-o", str(spades_dir), "-k", klist, "-t", str(config.threads)]
+    # Force Phred+33: modern Illumina is always Phred+33, but BayesHammer's
+    # auto-detection ("Failed to determine offset!") aborts on libraries with a
+    # narrow quality range. Pinning the offset makes assembly robust across runs.
+    cmd = ["spades.py", "-o", str(spades_dir), "-k", klist, "-t", str(config.threads),
+           "--phred-offset", "33"]
     if config.spades_careful:
         cmd += ["--careful"]
     if r2 is not None:
@@ -119,8 +123,11 @@ def run(config: Config, state: dict) -> dict:
     graph = spades_dir / "assembly_graph_with_scaffolds.gfa"
     if not graph.exists():
         graph = spades_dir / "assembly_graph.gfa"
-    if not contigs.exists():
-        raise RuntimeError(f"SPAdes produced no contigs at {contigs}")
+    if not contigs.exists() or contigs.stat().st_size == 0:
+        raise RuntimeError(
+            "S2: SPAdes produced no contigs — the recruited read set was too "
+            "sparse or malformed to assemble. Check that the input reads are "
+            "intact and R1/R2 are in sync (equal read counts).")
     log.info("S2: contigs=%s scaffolds=%s", contigs.name,
              scaffolds.name if scaffolds.exists() else "none")
     return {"contigs": contigs,
