@@ -105,6 +105,7 @@ def run(config: Config, state: dict) -> dict:
     bait_r1 = config.workdir / "s1_bait_R1.fastq.gz"
     bait_r2 = config.workdir / "s1_bait_R2.fastq.gz" if r2 is not None else None
     names: set[str] = set()
+    total = _count_seqs(config, r1)      # library size, for the runaway guard
 
     for rnd in range(config.bait_rounds):
         round_dir = config.workdir / f"s1_round{rnd}"
@@ -116,6 +117,22 @@ def run(config: Config, state: dict) -> dict:
             raise RuntimeError(
                 "S1 recruited 0 reads — check --seed-ref matches your reads' "
                 "kingdom, or lower --bait-min-len.")
+
+        # Runaway guard: round 0 maps against the conserved seed, so a large recruit
+        # there is genuine rDNA. But an *extension* round (>=1) that suddenly recruits
+        # a big fraction of the whole library has grown the bait into non-rDNA repeats
+        # (satellite/TE neighbours) — an unbounded blow-up. Fall back to the previous
+        # (sane) round's read set instead of assembling the whole genome.
+        if rnd >= 1 and total and n > config.bait_runaway_frac * total:
+            log.warning(
+                "S1 round %d recruited %d reads (>%.0f%% of the %d-read library) — "
+                "runaway bait extension into non-rDNA repeat; keeping round %d's set",
+                rnd, n, config.bait_runaway_frac * 100, total, rnd - 1)
+            prev_dir = config.workdir / f"s1_round{rnd - 1}"
+            prev_dir.joinpath("rec_R1.fastq.gz").replace(bait_r1)
+            if r2 is not None:
+                prev_dir.joinpath("rec_R2.fastq.gz").replace(bait_r2)
+            break
 
         names_file = round_dir / "names.txt"
         names_file.write_text("\n".join(sorted(names)) + "\n")

@@ -45,6 +45,8 @@ class Config:
     bait_rounds: int = 3               # max extension rounds
     bait_min_len: int = 40             # bowtie2 --local: report only if this many bp align
     bait_converge: float = 0.02        # stop when new-read fraction < this
+    bait_runaway_frac: float = 0.30    # an extension round recruiting >this fraction of the
+                                       # library is non-rDNA runaway; fall back to prior round
     subsample: int = 0                 # cap recruited pairs (0 = no cap); rDNA is deep
 
     # --- Stage 2: assembly ------------------------------------------------
