@@ -13,9 +13,10 @@ authors:
   - family-names: "Vu"
     given-names: "Trinh H."
     email: "maidinhvn@users.noreply.github.com"
+    orcid: "https://orcid.org/0000-0001-8178-0800"
+    affiliation: "Seoul National University, Seoul, Republic of Korea; An Giang University, Vietnam National University Ho Chi Minh City, An Giang, Vietnam"
 license: MIT
-version: "0.1.0"
-date-released: "2026-07-02"
+version: "0.2.0"
 keywords:
   - nrDNA
   - 45S

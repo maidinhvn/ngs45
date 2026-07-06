@@ -1,0 +1,22 @@
+{
+  "title": "ngs45: recovering the 45S nrDNA transcribed unit, ITS barcode and ribotype variation from Illumina short reads",
+  "description": "Pure-Python tool that baits, assembles (SPAdes) and annotates the mature 45S nrDNA transcribed unit (18S-ITS1-5.8S-ITS2-26S) and ITS barcode from Illumina short reads, and reports intragenomic ribotype heterogeneity as a hybridisation / allopolyploidy signal. Short-read counterpart of easy45 (HiFi).",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Vu, Trinh H.",
+      "affiliation": "Seoul National University, Seoul, Republic of Korea; An Giang University, Vietnam National University Ho Chi Minh City, An Giang, Vietnam",
+      "orcid": "0000-0001-8178-0800"
+    }
+  ],
+  "keywords": [
+    "45S nrDNA",
+    "ITS barcode",
+    "ribotype",
+    "Illumina",
+    "short-read assembly",
+    "plant barcoding",
+    "phylogenetics"
+  ]
+}
