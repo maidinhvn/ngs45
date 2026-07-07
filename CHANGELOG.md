@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.2.0 (2026-07-06)
+
+- **`batch` subcommand** — run a folder of samples in one command (auto-detects
+  `*_R1/_R2` or `*_1/_2`, flat or subfolder; resume; `batch_summary.tsv`).
+- **Coverage cap** (`--max-cov`, default 2000) downsamples the *assembly input only*
+  — SPAdes ~70 min → ~2 min for an essentially identical unit; variant calling keeps
+  full depth, so ribotype sensitivity is unaffected.
+- **Tandem-duplication QC** (S4) — self-BLAST collapses a spurious adjacent internal
+  repeat from a unit-junction mis-assembly; reported as `qc_tandem_dup_bp`.
+- **Robustness (surfaced by real-data benchmarking):** SPAdes `--phred-offset 33`
+  (avoids BayesHammer offset-detection aborts); bait runaway guard (an extension
+  round recruiting >30 % of the library falls back to the prior round); clear error
+  on empty contigs.
+- **Benchmark refreshed:** cross-individual (12 species / 12 orders) + same-individual
+  (6 species, same BioSample; 5/6 base-identical to the HiFi consensus). See
+  `docs/BENCHMARK.md`.
+
 ## v0.1.0 (2026-07-02)
 
 First public release.

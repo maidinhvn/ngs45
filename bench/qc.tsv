@@ -27,8 +27,6 @@ S2_same	Beta_vulgaris	Illumina	5000000	150.0	150	91	25.60
 S2_same	Beta_vulgaris	HiFi	120000	18205.3	18246	95	26.36
 S2_same	Citrus_sinensis	Illumina	5000000	148.9	150	97	31.05
 S2_same	Citrus_sinensis	HiFi	120000	13798.9	13802	95	25.72
-S2_same	Lindera_aggregata	Illumina	5000000	150.0	150	96	29.45
-S2_same	Lindera_aggregata	HiFi	120000	17904.5	17878	93	24.84
 S2_same	Musa_acuminata	Illumina	5000000	149.1	151	100	30.00
 S2_same	Musa_acuminata	HiFi	num_seqs	avg_len	N50	Q30(%)	AvgQual
 S2_same	Oryza_sativa	Illumina	5000000	100.0	100	79	13.50
@@ -37,4 +35,20 @@ S2_same	Populus_trichocarpa	Illumina	5000000	151.0	151	89	23.99
 S2_same	Populus_trichocarpa	HiFi	120000	15715.5	15884	97	27.40
 S2_same	Sesamum_indicum	Illumina	5000000	150.0	150	94	27.04
 S2_same	Sesamum_indicum	HiFi	120000	17072.3	16969	96	27.23
+S1_cross	Cynanchum_wilfordii	Illumina	5000000	151.0	151	95	28.27
+S1_cross	Cynanchum_wilfordii	HiFi	120000	12255.1	12438	92	23.45
+S1_cross	Gossypium_raimondii	Illumina	5000000	151.0	151	92	17.77
+S1_cross	Gossypium_raimondii	HiFi	120000	14759.5	14983	96	27.22
+S1_cross	Citrullus_lanatus	Illumina	5000000	151.0	151	93	26.13
+S1_cross	Citrullus_lanatus	HiFi	120000	18248.5	18819	95	26.29
+S1_cross	Phoenix_dactylifera	Illumina	5000000	150.0	151	95	27.97
+S1_cross	Phoenix_dactylifera	HiFi	120000	19541.9	20316	95	25.85
+S1_cross	Brassica_napus	Illumina	5000000	150.0	150	94	27.39
+S1_cross	Brassica_napus	HiFi	120000	19640.5	19497	93	24.88
+S1_cross	Triticum_aestivum	Illumina	5000000	150.0	150	92	25.22
+S1_cross	Triticum_aestivum	HiFi	120000	18680.7	18986	96	27.50
+S1_cross	Solanum_tuberosum	Illumina	5000000	151.0	151	89	24.80
+S1_cross	Solanum_tuberosum	HiFi	120000	21072.3	21549	96	27.07
+S1_cross	Zea_mays	Illumina	5000000	150.0	150	96	29.71
+S1_cross	Zea_mays	HiFi	120000	15247.6	15169	95	26.30
 QC DONE

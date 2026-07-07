@@ -1,8 +1,7 @@
-species	order	ngs45_bp	easy45_bp	same_indiv_pid
-Oryza_sativa	Poales	5783	5783	100.000
-Beta_vulgaris	Caryophyllales	5811	5811	100.000
-Citrus_sinensis	Sapindales	5845	5844	99.846
-Sesamum_indicum	Lamiales	5798	5798	100.000
-Musa_acuminata	Zingiberales	5804	5804	100.000
-Populus_trichocarpa	Malpighiales	5794	5794	100.000
-Lindera_aggregata	Laurales	5855	no_consensus	-
+species	order	ngs45_bp	easy45_bp	same_indiv_pid	biosample
+Oryza_sativa	Poales	5783	5783	100.000	SAMEA112646987
+Beta_vulgaris	Caryophyllales	5811	5811	100.000	SAMN30877666
+Citrus_sinensis	Sapindales	5845	5844	99.846	SAMD01669405
+Sesamum_indicum	Lamiales	5798	5798	100.000	SAMN30610312
+Musa_acuminata	Zingiberales	5804	5804	100.000	SAMN34246735
+Populus_trichocarpa	Malpighiales	5794	5794	100.000	SAMN56350631

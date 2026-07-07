@@ -1,0 +1,10 @@
+species	order	tier	ploidy_or_TE	ngs45_bp	easy45_bp	ngs_vs_easy_pid	ngs45_ribotype_sites	note
+Cynanchum_wilfordii	Gentianales	base-identical	diploid	5843	5843	100.000	5	new order
+Gossypium_raimondii	Malvales	base-identical	diploid	5883	5883	100.000	2	new order; TE~61%
+Citrullus_lanatus	Cucurbitales	base-identical	diploid	5829	5828	99.983	0	new order; 1bp len diff, 0 mm
+Phoenix_dactylifera	Arecales	base-identical	diploid	5935	5935	100.000	3	new order; monocot
+Brassica_napus	Brassicales	polyploid	allotetraploid_AACC	4296	5803	98.838	40	ngs45 partial unit (26S truncated); easy45 5 ribotypes
+Triticum_aestivum	Poales	polyploid	hexaploid_AABBDD	5803	5804	99.259	44	easy45 undersampled (16Gb genome) -> 1 ribotype
+Solanum_tuberosum	Solanales	polyploid	autotetraploid	5792	5801	99.638	24	mild polyploid signature
+Helianthus_annuus	Asterales	high-TE-fail	TE~75-80pct_3.6Gb	-	5857	-	-	ngs45 fail (best contig 493bp); easy45 rescues
+Zea_mays	Poales	high-TE-fail	TE~85pct_2.4Gb	-	5792	-	-	ngs45 fail (best contig 3837bp; runaway guard); easy45 rescues

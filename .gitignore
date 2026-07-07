@@ -35,3 +35,6 @@ bench/ribotin/
 bench/blast/
 bench/ident/
 bench/*.stdout
+
+# local backups
+*.bak
