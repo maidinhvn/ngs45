@@ -10,8 +10,8 @@ abstract: >-
   allopolyploidy signal. It is the short-read counterpart of easy45 (HiFi).
 type: software
 authors:
-  - family-names: "Vu"
-    given-names: "Trinh H."
+  - family-names: "Trinh"
+    given-names: "Hoai Vu"
     email: "maidinhvn@users.noreply.github.com"
     orcid: "https://orcid.org/0000-0001-8178-0800"
     affiliation: "Seoul National University, Seoul, Republic of Korea; An Giang University, Vietnam National University Ho Chi Minh City, An Giang, Vietnam"
