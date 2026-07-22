@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- **Docs — troubleshooting a unit that looks wrong** (`docs/TROUBLESHOOTING.md`,
+  summarised in the README). ngs45 halts only when the assembly clearly fails to
+  span a unit; it can otherwise splice divergent rDNA paralogs or IGS into the
+  output and still exit `OK`. Documents how to spot this (unit length vs the
+  ~5.8 kb benchmark range, a discontinuous or low-identity BLAST to a related
+  45S, ribotype sites clustered at anomalously low depth) and the workaround —
+  re-assemble with a tighter `--max-cov` (200; titrate 2000 → 500 → 200), which
+  caps the assembly input only, leaving variant-calling depth untouched.
+  Documentation only; no code change.
+
 ## v0.2.0 (2026-07-06)
 
 - **`batch` subcommand** — run a folder of samples in one command (auto-detects

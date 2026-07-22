@@ -123,6 +123,24 @@ timing. All `run` options (`-t`, `--call-variants`, `--max-cov`, …) apply.
 | `report.txt` | human-readable run report |
 | `ribotype_variants.tsv` | ribotype sites (only with `--call-variants`) |
 
+## Troubleshooting a unit that looks wrong
+
+ngs45 always returns a sequence; it does **not** fail loudly when the assembly
+wanders into divergent rDNA paralogs or the IGS. Quick checks:
+
+- **Length** — `unit_len` should be ~5.8 kb (5,780–5,940 bp across our
+  benchmark). An outlier among samples of the same species is suspicious.
+- **BLAST vs a related 45S** — a good unit gives one continuous, high-identity
+  alignment; an early stop, a low-identity tail, or a divergent internal segment
+  all indicate a bad assembly.
+- **`ribotype_variants.tsv`** — variant sites clustered in a region of much lower
+  depth than the rest of the unit usually mark an artifact, not biology.
+
+If a unit looks wrong, re-assemble with a tighter coverage cap
+(`--max-cov 200`, titrating 2000 → 500 → 200 if needed). This limits the
+assembly input only; variant calling still uses full depth.
+See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+
 ## Relationship to easy45
 
 ngs45 is the **short-read** counterpart of
@@ -170,6 +188,7 @@ ngs45 check-deps
 - [docs/FIGURES.md](docs/FIGURES.md) — benchmark figures
 - [docs/QC.md](docs/QC.md) — dataset QC + read-length titration
 - [docs/ASSEMBLY_LIMITATION.md](docs/ASSEMBLY_LIMITATION.md) — scope & limits
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — spotting and fixing a bad unit
 - [docs/DATA_ACCESSIONS.md](docs/DATA_ACCESSIONS.md) — all NCBI/ENA accessions
 
 ## Citation
