@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.3.0 (2026-08-23)
+
+- **Faster baiting (S1) — depth early-stop.** Iterative baiting now stops once the
+  recruited set already saturates the assembly coverage cap (default `bait_stop_cov`
+  6000× = 3× `--max-cov`), after ≥1 extension round. On deep libraries this skips a
+  final round that the runaway guard would discard anyway, so the output is
+  identical while S1 (95–99 % of runtime) drops ~10× (e.g. wheat ~5 h → ~40 min).
+- **Gene-end graft (S4).** When SPAdes fragments the array at a coverage transition
+  and the best contig is missing the 18S 5′ or 26S 3′ end (cmsearch reports a
+  one-sided `trunc`), the missing end is grafted from an adjacent rDNA contig by
+  their overlap. Rescues species like *Sesamum* (5344 → 5798 bp, 100 % to the HiFi
+  unit); a no-op when the monomer already spans both genes.
+- **`--reference-guided` fallback (opt-in).** When de novo assembly cannot span a
+  unit, map the baited reads to a (close) `--seed-ref` and call a consensus — a
+  usable 45S for NGS-only libraries with no HiFi option. Reference-biased and
+  clearly labelled (FASTA header, report banner, `summary.tsv`); default off.
+- **Guiding failure message.** A too-short assembly now points the user at a closer
+  `--seed-ref` (a congener 45S rescued a *Vitis* run 2904 → 6739 bp) and, as a last
+  resort, `--reference-guided`.
+- **Contaminant warning (S3).** Flags a picked contig that looks unlike a plant
+  nuclear 45S (GC/identity to the seed) — a fungal endophyte or plastid rRNA
+  recruited via the conserved genes.
+- **Low-depth warning (S3).** Warns when the picked contig's coverage is low.
+- **barrnap pinned `>=0.9,<1.0`** + a `check-deps` probe that fails fast if barrnap
+  lacks the eukaryote DB (bioconda's `barrnap 1.10.6` ships only bac/arc/fun).
+- **Pipeline figure updated** (`docs/pipeline.{dot,png,svg}`).
+
 ## Unreleased
 
 - **Docs — troubleshooting a unit that looks wrong** (`docs/TROUBLESHOOTING.md`,

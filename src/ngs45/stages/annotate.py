@@ -101,7 +101,14 @@ def run(config: Config, state: dict) -> dict:
     _n, unit = read_fasta(state["monomer"])[0]
 
     final_fasta = config.outdir / "nrDNA_45S.fasta"
-    write_fasta([("nrDNA_45S_unit", unit)], final_fasta)
+    # keep "nrDNA_45S_unit" as the first token (GFF seqid) but flag a
+    # reference-guided (biased) result so it is never mistaken for de novo.
+    header = "nrDNA_45S_unit"
+    if state.get("reference_guided"):
+        header += (" reference_guided=True "
+                   "(REFERENCE-BIASED: de novo assembly failed; spacers may follow "
+                   "the seed, not this sample)")
+    write_fasta([(header, unit)], final_fasta)
 
     positions, regions = _itsx(config, final_fasta)
     source = "ngs45"

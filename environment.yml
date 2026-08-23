@@ -14,7 +14,7 @@ dependencies:
   - samtools       # S6 BAM handling / depth
   - bcftools       # S6 ribotype variant calling
   - infernal       # cmsearch: Rfam SSU/LSU CM mature-boundary trim (S4)
-  - barrnap        # S4 orientation (18S strand)
+  - barrnap >=0.9,<1.0   # S5 annotation fallback (needs euk HMM DB); avoid 1.10.6
   - itsx           # S5 delimit SSU/ITS1/5.8S/ITS2/LSU (annotation + ITS barcode)
   - cutadapt       # S0 adapter / quality trimming
   # dev ------------------------------------------------------------------

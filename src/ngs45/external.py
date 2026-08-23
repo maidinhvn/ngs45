@@ -40,14 +40,37 @@ REQUIRED_TOOLS = (
 
 
 class DependencyError(RuntimeError):
-    """Raised when a required external tool is missing from PATH."""
+    """Raised when a required external tool is missing or lacks a capability."""
+
+
+def _barrnap_supports_euk(barrnap: str) -> bool:
+    """barrnap must ship the eukaryote HMM DB: the S5 annotation fallback calls
+    `barrnap --kingdom euk`.
+
+    Presence on PATH is not enough. The bioconda `barrnap 1.10.6` build ships
+    only bac/arc/fun and rejects `--kingdom euk`. barrnap advertises the
+    kingdoms it accepts in `--help` (0.7-0.9 print e.g. "Kingdom: bac mito arc
+    euk"), so probe that — fast and exactly what the tool will accept.
+    """
+    try:
+        r = subprocess.run(
+            [barrnap, "--help"], capture_output=True, text=True, timeout=30
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    help_text = (r.stdout or "") + (r.stderr or "")
+    for line in help_text.splitlines():
+        if "kingdom" in line.lower():
+            return "euk" in line.lower()
+    return False
 
 
 def check_dependencies(include_optional: bool = False) -> dict[str, str | None]:
-    """Verify required tools are on PATH. Returns {tool: resolved_path_or_None}.
+    """Verify required tools are on PATH *and* capable. Returns {tool: path}.
 
-    Raises DependencyError listing every missing tool at once. Optional tools
-    are only enforced when ``include_optional`` is set.
+    Raises DependencyError listing every missing tool at once, and (separately)
+    if barrnap is present but lacks the eukaryote database. Optional tools are
+    only enforced when ``include_optional`` is set.
     """
     found: dict[str, str | None] = {}
     missing: list[str] = []
@@ -62,6 +85,16 @@ def check_dependencies(include_optional: bool = False) -> dict[str, str | None]:
             "Missing required tool(s): "
             + ", ".join(missing)
             + "\nInstall everything with: conda env create -f environment.yml"
+        )
+    barrnap = found.get("barrnap")
+    if barrnap and not _barrnap_supports_euk(barrnap):
+        raise DependencyError(
+            f"barrnap is installed ({barrnap}) but lacks the eukaryote HMM "
+            "database: it does not accept `--kingdom euk`, needed by the S5 "
+            "annotation fallback. This is the bioconda `barrnap 1.10.6` build, "
+            "which ships only bac/arc/fun. Install the Torsten Seemann barrnap "
+            "that ships the euk DB:\n"
+            "    conda install -c bioconda 'barrnap>=0.9,<1.0'"
         )
     return found
 

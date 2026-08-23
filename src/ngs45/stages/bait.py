@@ -18,6 +18,7 @@ Output keys: {"bait_r1", "bait_r2", "bait_n_pairs"}
 
 from __future__ import annotations
 
+import gzip
 import logging
 import subprocess
 
@@ -26,6 +27,19 @@ from ..external import run as sh
 from ..io import read_fasta, write_fasta
 
 log = logging.getLogger("ngs45")
+
+
+def _read_len(path) -> int:
+    """Length of the first read (cheap: two lines of the gzip), for depth math."""
+    if path is None:
+        return 0
+    try:
+        opener = gzip.open if str(path).endswith(".gz") else open
+        with opener(path, "rt") as fh:
+            fh.readline()               # @name
+            return len(fh.readline().strip())
+    except OSError:
+        return 0
 
 
 def _aligned_names(sam_path) -> set[str]:
@@ -106,6 +120,7 @@ def run(config: Config, state: dict) -> dict:
     bait_r2 = config.workdir / "s1_bait_R2.fastq.gz" if r2 is not None else None
     names: set[str] = set()
     total = _count_seqs(config, r1)      # library size, for the runaway guard
+    read_len = _read_len(r1)             # for the depth-based early stop
 
     for rnd in range(config.bait_rounds):
         round_dir = config.workdir / f"s1_round{rnd}"
@@ -140,8 +155,22 @@ def run(config: Config, state: dict) -> dict:
                        round_dir / "rec_R1.fastq.gz",
                        round_dir / "rec_R2.fastq.gz" if r2 else None)
 
-        # converged, or last round: this round's reads are the final bait set
-        if rnd == config.bait_rounds - 1 or (prev_n and grew < config.bait_converge):
+        # Depth-based early stop: once the recruited set already saturates the
+        # assembly's coverage cap (after >=1 extension, so spacers are recruited),
+        # further rounds are downsampled away by S2 and only risk the runaway above
+        # -> stop now and skip the doomed round. Same formula S2 uses for depth.
+        depth = (2 * n * read_len) / (config.unit_min_len * 2.5) if read_len else 0.0
+        enough_depth = (config.bait_stop_cov > 0 and rnd >= 1
+                        and depth >= config.bait_stop_cov)
+
+        # converged, last round, or deep enough: this round's reads are the final set
+        if (rnd == config.bait_rounds - 1
+                or (prev_n and grew < config.bait_converge)
+                or enough_depth):
+            if enough_depth:
+                log.info("S1: bait depth ~%.0fx after round %d (>= %dx, saturates the "
+                         "assembly cap) -> stop early; deeper rounds are discarded by "
+                         "S2 anyway", depth, rnd, config.bait_stop_cov)
             round_dir.joinpath("rec_R1.fastq.gz").replace(bait_r1)
             if r2 is not None:
                 round_dir.joinpath("rec_R2.fastq.gz").replace(bait_r2)

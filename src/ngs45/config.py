@@ -47,7 +47,20 @@ class Config:
     bait_converge: float = 0.02        # stop when new-read fraction < this
     bait_runaway_frac: float = 0.30    # an extension round recruiting >this fraction of the
                                        # library is non-rDNA runaway; fall back to prior round
+    bait_stop_cov: int = 6000          # stop baiting once the recruited set reaches this xcoverage
+                                       # of a nominal repeat (after >=1 extension): the assembly
+                                       # caps depth at assemble_max_cov, so deeper rounds are
+                                       # discarded anyway and only risk the runaway above. Skips
+                                       # the doomed final round -> ~10x faster on deep libraries,
+                                       # identical output. Set 0 to disable.
     subsample: int = 0                 # cap recruited pairs (0 = no cap); rDNA is deep
+    reference_guided: bool = False     # opt-in fallback: if de novo assembly can't span a
+                                       # unit, map baited reads to --seed-ref and call a
+                                       # consensus. REFERENCE-BIASED (uncovered positions stay
+                                       # at the reference; intragenomic heterogeneity collapses)
+                                       # -> a usable 45S for NGS-only libraries where de novo
+                                       # fails, NOT an unbiased de novo reconstruction. Needs a
+                                       # phylogenetically close --seed-ref to be meaningful.
 
     # --- Stage 2: assembly ------------------------------------------------
     spades_k: str = "auto"             # "auto" => 21,33,55,77,99,127 (filtered to < read length in S2)
@@ -62,6 +75,9 @@ class Config:
     # --- Stage 3: monomer resolution --------------------------------------
     unit_min_len: int = 4000           # a 45S transcribed unit is typically 5-8 kb
     unit_max_len: int = 20000          # ceiling incl. long IGS
+    min_cov_warn: float = 10.0         # warn if the picked rDNA contig's SPAdes k-mer
+                                       # coverage is below this: low rDNA depth (small/
+                                       # noisy library) -> the unit may be unreliable
     min_gene_ident: float = 70.0       # blast %id for a seed-gene hit on a contig
 
     # --- Stage 4: mature-boundary trim + assembly QC ----------------------

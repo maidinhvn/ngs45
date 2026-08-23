@@ -40,6 +40,10 @@ def run(config: Config, state: dict) -> dict:
         "ITS_barcode_len": annot.get("ITS_barcode_len", ""),
         "ribotype_sites": n_sites if n_sites is not None else "",
         "qc_tandem_dup_bp": sum(state.get("qc_dup_removed") or []),
+        "reference_guided": bool(state.get("reference_guided")),
+        "contaminant_suspect": bool(state.get("contaminant_suspect")),
+        "seed_identity_pct": state.get("contaminant_ident", ""),
+        "GC_vs_seed": state.get("contaminant_gc", ""),
     }
     summary = config.outdir / "summary.tsv"
     with open(summary, "w") as s:
@@ -50,6 +54,27 @@ def run(config: Config, state: dict) -> dict:
     reads = f"{config.reads1}" + (f" , {config.reads2}" if config.reads2 else "")
     L = [
         "ngs45 run report", "=" * 40,
+    ]
+    if state.get("reference_guided"):
+        L += [
+            "*** REFERENCE-GUIDED RESULT (de novo assembly did not span a unit) ***",
+            "    Baited reads were mapped to the seed and a consensus called. This is",
+            "    reference-biased: uncovered / divergent positions follow the seed, so",
+            "    the spacers (ITS/ETS) may reflect the reference, not this sample.",
+            "    Trust the conserved genes; treat spacers/barcode with caution unless",
+            "    the seed is a close relative. Not an unbiased de novo reconstruction.",
+            "",
+        ]
+    if state.get("contaminant_suspect"):
+        L += [
+            "*** WARNING: picked contig may be a CONTAMINANT, not your target ***",
+            f"    GC {state.get('contaminant_gc', '?')}% and "
+            f"{state.get('contaminant_ident', '?')}% identity to the plant seed "
+            "look unlike a plant nuclear 45S (fungal endophyte / plastid rRNA "
+            "recruited via the conserved genes). Verify the organism.",
+            "",
+        ]
+    L += [
         f"reads:      {reads}",
         f"seed:       {config.seed_ref.name}",
         f"unit:       nrDNA_45S transcribed unit, {annot.get('unit_len', '?')} bp, "

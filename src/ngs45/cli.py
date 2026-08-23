@@ -34,6 +34,10 @@ def _build_parser() -> argparse.ArgumentParser:
     r.add_argument("--bait-rounds", type=int, default=3)
     r.add_argument("--subsample", type=int, default=0,
                    help="cap recruited pairs (0 = keep all)")
+    r.add_argument("--reference-guided", action="store_true",
+                   help="if de novo assembly can't span a unit, map baited reads "
+                        "to --seed-ref and emit a reference-guided consensus "
+                        "(biased; for NGS-only libraries where de novo fails)")
     r.add_argument("--spades-k", default="auto", help="SPAdes k-mer list (default auto)")
     r.add_argument("--max-cov", type=int, default=2000,
                    help="cap baited depth for assembly to ~this x of an rDNA repeat "
@@ -111,6 +115,7 @@ def main(argv: list | None = None) -> int:
             trim=args.trim,
             bait_rounds=args.bait_rounds,
             subsample=args.subsample,
+            reference_guided=args.reference_guided,
             spades_k=args.spades_k,
             assemble_max_cov=args.max_cov,
             call_variants=args.call_variants,

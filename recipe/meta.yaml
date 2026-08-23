@@ -32,7 +32,10 @@ requirements:
     - spades
     - seqkit
     - blast
-    - barrnap
+    # barrnap must ship the eukaryote HMM DB (S5 annotation fallback calls
+    # `barrnap --kingdom euk`); the bioconda `barrnap 1.10.6` build has only
+    # bac/arc/fun and crashes that path. Pin to the Torsten Seemann line.
+    - barrnap >=0.9,<1.0
     - itsx
     - infernal
     - bwa

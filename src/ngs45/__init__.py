@@ -8,4 +8,4 @@ and annotates it, then maps reads back to quantify ribotype heterogeneity.
 
 from __future__ import annotations
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
