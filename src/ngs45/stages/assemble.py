@@ -21,6 +21,8 @@ Output keys: {"contigs", "scaffolds", "graph", "spades_dir"}
 from __future__ import annotations
 
 import logging
+import shutil
+import subprocess
 
 from ..config import Config
 from ..external import run as sh
@@ -93,6 +95,33 @@ def _cap_coverage(config: Config, r1, r2, readlen):
     return ds1, ds2
 
 
+def _run_spades(config: Config, cmd, spades_dir) -> None:
+    """Run SPAdes, retrying a non-deterministic crash before giving up.
+
+    SPAdes occasionally aborts (non-zero exit, e.g. a thread segfault/assertion)
+    on high-TE / low-complexity recruited read sets — the same input then succeeds
+    on a fresh re-run (observed on Helianthus: exit 255 once, then a clean 5857 bp
+    unit). Retrying removes that reproducibility hazard; a persistent failure still
+    raises a clear error instead of a raw traceback.
+    """
+    attempts = max(1, config.spades_retries + 1)
+    for i in range(1, attempts + 1):
+        try:
+            sh(cmd)
+            return
+        except subprocess.CalledProcessError as e:
+            if i >= attempts:
+                raise RuntimeError(
+                    f"S2: SPAdes failed {attempts}x (last exit {e.returncode}). It "
+                    "can crash non-deterministically on high-TE / low-complexity "
+                    "recruited reads. If it persists, try a lower --max-cov or a "
+                    "cleaner library.") from None
+            log.warning("S2: SPAdes exited %s (attempt %d/%d) — likely a "
+                        "non-deterministic crash; cleaning and retrying.",
+                        e.returncode, i, attempts)
+            shutil.rmtree(spades_dir, ignore_errors=True)
+
+
 def run(config: Config, state: dict) -> dict:
     r1 = state["bait_r1"]
     r2 = state.get("bait_r2")
@@ -116,7 +145,7 @@ def run(config: Config, state: dict) -> dict:
 
     log.info("S2: SPAdes assembly (readlen~%d -> k=%s, careful=%s)",
              readlen, klist, config.spades_careful)
-    sh(cmd)
+    _run_spades(config, cmd, spades_dir)
 
     contigs = spades_dir / "contigs.fasta"
     scaffolds = spades_dir / "scaffolds.fasta"

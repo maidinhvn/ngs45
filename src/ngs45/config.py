@@ -66,6 +66,9 @@ class Config:
     spades_k: str = "auto"             # "auto" => 21,33,55,77,99,127 (filtered to < read length in S2)
     spades_careful: bool = False       # off by default: --careful's mismatch corrector
                                        # fragments variant-rich rDNA (see stages/assemble.py)
+    spades_retries: int = 2            # retry a non-deterministic SPAdes crash this many
+                                       # times before failing (high-TE/low-complexity reads
+                                       # can abort once then assemble fine on a fresh run)
     min_cov: float = 0.0               # drop assembly-graph nodes below this k-mer coverage
     assemble_max_cov: int = 2000       # cap baited depth before SPAdes: the rDNA array is
                                        # 10^4-10^5x deep, which is useless and makes assembly

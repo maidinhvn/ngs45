@@ -29,6 +29,13 @@
 
 ## Unreleased
 
+- **SPAdes crash resilience (S2).** SPAdes can abort non-deterministically
+  (non-zero exit) on high-TE / low-complexity recruited reads — the same input
+  then assembles cleanly on a fresh re-run (seen on *Helianthus*: exit 255 once,
+  then a 5857 bp unit). S2 now retries (`--spades-retries`, default 2) before
+  failing, and raises a clear error instead of a raw traceback. Removes a
+  reproducibility hazard.
+
 - **Docs — troubleshooting a unit that looks wrong** (`docs/TROUBLESHOOTING.md`,
   summarised in the README). ngs45 halts only when the assembly clearly fails to
   span a unit; it can otherwise splice divergent rDNA paralogs or IGS into the
