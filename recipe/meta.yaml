@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/maidinhvn/ngs45/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: PENDING_FILL_AFTER_TAG
+  sha256: a9e588c80f8df9d43980ed7b8ae0f881afb2dcf282dedd094256a32544420145
 
 build:
   noarch: python
