@@ -40,6 +40,9 @@ def run(config: Config, state: dict) -> dict:
         "ITS_barcode_len": annot.get("ITS_barcode_len", ""),
         "ribotype_sites": n_sites if n_sites is not None else "",
         "qc_tandem_dup_bp": sum(state.get("qc_dup_removed") or []),
+        # "" when both flanking genes are full length; otherwise names the
+        # incomplete end, so a partial unit is reported rather than silent.
+        "unit_truncated_end": state.get("unit_truncated_end", ""),
         "reference_guided": bool(state.get("reference_guided")),
         "contaminant_suspect": bool(state.get("contaminant_suspect")),
         "seed_identity_pct": state.get("contaminant_ident", ""),
@@ -79,6 +82,9 @@ def run(config: Config, state: dict) -> dict:
         f"seed:       {config.seed_ref.name}",
         f"unit:       nrDNA_45S transcribed unit, {annot.get('unit_len', '?')} bp, "
         f"GC {annot.get('GC_percent', '?')}%",
+        *( [f"WARNING:    INCOMPLETE unit - {state['unit_truncated_end']} is truncated; "
+            f"treat this sequence as partial"]
+           if state.get("unit_truncated_end") else [] ),
         f"annotation: {annot.get('annot_source', '?')}",
         f"bait pairs: {state.get('bait_n_pairs', '?')}",
         "",

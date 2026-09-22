@@ -171,6 +171,26 @@ def _repair_truncated_monomer(config: Config, seq: str, state):
     return seq, repaired
 
 
+def _final_truncation(config: Config, unit: str) -> str:
+    """Which flanking gene of the delivered unit is still incomplete, if any.
+
+    S4 grafts a missing gene end back when an adjacent contig carries it, but that
+    is not always possible: the assembly may simply not contain the end. The unit is
+    still emitted (it is the best available), so this probes the *delivered*
+    sequence and names the incomplete end, turning a silent partial result into a
+    reported one. Returns "" when both genes are full length.
+    """
+    hits = _cmsearch_trunc(config, unit, "final_probe")
+    ssu = [h for h in hits if h[0] == "SSU" and h[3] == "+"]
+    lsu = [h for h in hits if h[0] == "LSU" and h[3] == "+"]
+    ends = []
+    if ssu and all("5'" in h[5] for h in ssu):
+        ends.append("18S 5'")
+    if lsu and all("3'" in h[5] for h in lsu):
+        ends.append("26S 3'")
+    return " + ".join(ends)
+
+
 def _cmsearch(config: Config, seq: str, tag: str):
     """Run cmsearch(SSU+LSU) on `seq`; return [(kind, sfrom, sto, strand, score)]."""
     fa = config.workdir / f"s4_{tag}.fasta"
@@ -298,4 +318,15 @@ def run(config: Config, state: dict) -> dict:
     write_fasta([("nrDNA_45S_unit", unit)], out)
     log.info("S4: CM mature-boundary trim -> transcribed unit %d bp "
              "(18S 5' .. 26S 3'); full repeat %d bp", len(unit), period)
-    return {"monomer": out, "full_repeat": full_out, "qc_dup_removed": dup_removed}
+
+    # The unit is emitted even when a flanking gene could not be completed; say so
+    # instead of letting a partial result pass as a full one.
+    trunc_end = _final_truncation(config, unit)
+    if trunc_end:
+        log.warning("S4: the recovered unit is INCOMPLETE - %s still truncated after "
+                    "boundary trimming (%d bp). The assembly did not span that gene "
+                    "end and no adjacent contig carried it. Treat this unit as partial; "
+                    "more Illumina depth or a closer --seed-ref may recover it.",
+                    trunc_end, len(unit))
+    return {"monomer": out, "full_repeat": full_out, "qc_dup_removed": dup_removed,
+            "unit_truncated_end": trunc_end}

@@ -120,7 +120,6 @@ def run(config: Config, state: dict) -> dict:
     bait_r2 = config.workdir / "s1_bait_R2.fastq.gz" if r2 is not None else None
     names: set[str] = set()
     total = _count_seqs(config, r1)      # library size, for the runaway guard
-    read_len = _read_len(r1)             # for the depth-based early stop
 
     for rnd in range(config.bait_rounds):
         round_dir = config.workdir / f"s1_round{rnd}"
@@ -155,32 +154,37 @@ def run(config: Config, state: dict) -> dict:
                        round_dir / "rec_R1.fastq.gz",
                        round_dir / "rec_R2.fastq.gz" if r2 else None)
 
-        # Depth-based early stop: once the recruited set already saturates the
-        # assembly's coverage cap (after >=1 extension, so spacers are recruited),
-        # further rounds are downsampled away by S2 and only risk the runaway above
-        # -> stop now and skip the doomed round. Same formula S2 uses for depth.
-        depth = (2 * n * read_len) / (config.unit_min_len * 2.5) if read_len else 0.0
-        enough_depth = (config.bait_stop_cov > 0 and rnd >= 1
-                        and depth >= config.bait_stop_cov)
-
-        # converged, last round, or deep enough: this round's reads are the final set
-        if (rnd == config.bait_rounds - 1
-                or (prev_n and grew < config.bait_converge)
-                or enough_depth):
-            if enough_depth:
-                log.info("S1: bait depth ~%.0fx after round %d (>= %dx, saturates the "
-                         "assembly cap) -> stop early; deeper rounds are discarded by "
-                         "S2 anyway", depth, rnd, config.bait_stop_cov)
+        # Stop when new-read growth has converged (or on the last round): the recruited
+        # set is then stable and spans the unit. We deliberately do NOT stop early on
+        # depth alone -- the terminal, species-specific reads that complete a gene end can
+        # arrive in a later round and are invisible to the conserved seed, so a depth-only
+        # early stop truncated a unit (Populus 5453 vs 5794 bp). Cost is bounded instead by
+        # capping the reads used to build the next round's reference (below), which keeps
+        # the extra rounds cheap without ever dropping a round.
+        if rnd == config.bait_rounds - 1 or (prev_n and grew < config.bait_converge):
             round_dir.joinpath("rec_R1.fastq.gz").replace(bait_r1)
             if r2 is not None:
                 round_dir.joinpath("rec_R2.fastq.gz").replace(bait_r2)
             break
 
-        # else: grow the bait = seed + recruited reads, and go again
+        # else: grow the bait = seed + recruited reads, and go again. Cap the reads used
+        # to BUILD the reference (not the recruited output) so the bowtie2 index stays
+        # small on deep libraries -- indexing millions of rDNA reads otherwise blows up
+        # time and memory (e.g. wheat: hours / >14 GB). A capped subsample still spans the
+        # unit densely, so the reads recruited next round are unchanged.
         ext_ref = round_dir / "bait_ref.fasta"
         seed_records = read_fasta(config.seed_ref)
-        rec = _fq_to_fasta_records(config, round_dir / "rec_R1.fastq.gz",
-                                   round_dir / "rec_R2.fastq.gz" if r2 else None)
+        ref_r1 = round_dir / "rec_R1.fastq.gz"
+        ref_r2 = round_dir / "rec_R2.fastq.gz" if r2 else None
+        if config.bait_ref_cap and n > config.bait_ref_cap:
+            capped = round_dir / "ref_cap_R1.fastq.gz"
+            sh(["seqkit", "head", "-n", str(config.bait_ref_cap), str(ref_r1), "-o", str(capped)])
+            ref_r1 = capped
+            if r2:
+                capped2 = round_dir / "ref_cap_R2.fastq.gz"
+                sh(["seqkit", "head", "-n", str(config.bait_ref_cap), str(ref_r2), "-o", str(capped2)])
+                ref_r2 = capped2
+        rec = _fq_to_fasta_records(config, ref_r1, ref_r2)
         write_fasta(seed_records + rec, ext_ref)
         ref = ext_ref
         prev_n = n

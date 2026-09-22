@@ -47,12 +47,13 @@ class Config:
     bait_converge: float = 0.02        # stop when new-read fraction < this
     bait_runaway_frac: float = 0.30    # an extension round recruiting >this fraction of the
                                        # library is non-rDNA runaway; fall back to prior round
-    bait_stop_cov: int = 6000          # stop baiting once the recruited set reaches this xcoverage
-                                       # of a nominal repeat (after >=1 extension): the assembly
-                                       # caps depth at assemble_max_cov, so deeper rounds are
-                                       # discarded anyway and only risk the runaway above. Skips
-                                       # the doomed final round -> ~10x faster on deep libraries,
-                                       # identical output. Set 0 to disable.
+    bait_ref_cap: int = 200000         # cap the recruited reads used to BUILD each extension
+                                       # round's bowtie2 reference (0 = no cap). Deep rDNA
+                                       # recruits millions of reads; indexing all of them blows
+                                       # up time and memory (e.g. wheat: hours / >14 GB). A capped
+                                       # subsample still spans the unit densely, so the reads
+                                       # recruited next round are unchanged -- this bounds cost
+                                       # without ever dropping a baiting round (no truncation).
     subsample: int = 0                 # cap recruited pairs (0 = no cap); rDNA is deep
     reference_guided: bool = False     # opt-in fallback: if de novo assembly can't span a
                                        # unit, map baited reads to --seed-ref and call a

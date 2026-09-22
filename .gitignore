@@ -46,3 +46,14 @@ src/ngs45/data/*.fasta.bwt
 src/ngs45/data/*.fasta.pac
 src/ngs45/data/*.fasta.sa
 src/ngs45/data/*.fasta.fai
+
+# ---- manuscript / unpublished material (never commit to the public repo) ----
+manuscript/
+archive_preV030/
+*.docx
+
+# ---- generated figure images (regenerate with docs/figures/*.py) ----
+docs/figures/*.pdf
+docs/figures/*.eps
+docs/figures/*.tif
+docs/figures/*.png

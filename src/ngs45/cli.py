@@ -32,6 +32,9 @@ def _build_parser() -> argparse.ArgumentParser:
     r.add_argument("-t", "--threads", type=int, default=4)
     r.add_argument("--trim", action="store_true", help="quality/adapter trim with cutadapt (S0)")
     r.add_argument("--bait-rounds", type=int, default=3)
+    r.add_argument("--bait-ref-cap", type=int, default=200000,
+                   help="cap the recruited reads used to build each baiting round's reference "
+                        "(0 = no cap); bounds index time/memory on deep rDNA libraries")
     r.add_argument("--subsample", type=int, default=0,
                    help="cap recruited pairs (0 = keep all)")
     r.add_argument("--reference-guided", action="store_true",
@@ -114,6 +117,7 @@ def main(argv: list | None = None) -> int:
             threads=args.threads,
             trim=args.trim,
             bait_rounds=args.bait_rounds,
+            bait_ref_cap=args.bait_ref_cap,
             subsample=args.subsample,
             reference_guided=args.reference_guided,
             spades_k=args.spades_k,
